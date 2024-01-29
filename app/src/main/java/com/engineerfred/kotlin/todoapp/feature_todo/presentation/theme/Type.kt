@@ -1,4 +1,4 @@
-package com.engineerfred.kotlin.todoapp.ui.theme
+package com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

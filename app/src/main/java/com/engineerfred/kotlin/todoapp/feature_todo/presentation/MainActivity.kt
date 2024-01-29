@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.TodosScreen
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme.ToDoAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -16,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoAppTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-
+                    TodosScreen()
                 }
             }
         }

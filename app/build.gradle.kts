@@ -1,9 +1,10 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -43,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
@@ -54,8 +55,7 @@ android {
 
 dependencies {
 
-    implementation("com.google.firebase:firebase-database:20.3.0")
-    val hiltVersion = "2.48"
+    val hiltVersion = "2.48.1"
     val composeNavigationVersion = "2.7.6"
     val hiltComposeNavigationVersion = "1.1.0"
     val coroutinesVersion = "1.7.3"
@@ -76,6 +76,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation("com.google.firebase:firebase-database:20.3.0")
 
 
     //dagger-hilt
@@ -112,13 +114,10 @@ dependencies {
     //constraintlayout
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
-
     //room
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    //noinspection KaptUsageInsteadOfKsp
-    kapt("androidx.room:room-compiler:$roomVersion")
-    implementation("androidx.room:room-paging:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 }
 
 kapt {

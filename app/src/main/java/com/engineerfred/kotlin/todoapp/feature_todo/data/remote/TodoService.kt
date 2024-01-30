@@ -18,12 +18,12 @@ interface TodoService {
 //    suspend fun getTodoById( @Query("equalTo") id: Long ) : Map<Long, TodoDto>
 
     @PUT
-    suspend fun addTodo( @Url url: String, @Body todo: TodoDto ) : Response<Unit>
+    suspend fun addTodo( @Url url: String, @Body todo: TodoDto )
 
     @PUT("todos/{id}.json")
-    suspend fun updateTodo( @Path("id") id: Long, @Body todo: TodoDto ) : Response<Unit>
+    suspend fun updateTodo( @Path("id") id: Long, @Body todo: TodoDto )
 
     @DELETE("todos/{id}.json")
-    suspend fun deleteTodo( @Path("id") id: Long ) : Response<Unit>
+    suspend fun deleteTodo( @Path("id") id: Long )
 
 }

@@ -13,7 +13,7 @@ interface TodoDao {
     fun getAllTodos() : Flow<List<TodoEntity>>
 
     @Query("SELECT * FROM toDo WHERE id = :id")
-    fun getTodoIById(id: Long ) : Flow<TodoEntity?>
+    fun getTodoById(id: Long ) : Flow<TodoEntity?>
 
     @Upsert
     suspend fun addAllRemoteTodos( todos : List<TodoEntity> )

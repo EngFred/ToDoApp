@@ -7,4 +7,5 @@ data class Todo(
     val timeStamp: Long,
     val completed: Boolean,
     val archived: Boolean,
+    val isSynced: Boolean = false
 )

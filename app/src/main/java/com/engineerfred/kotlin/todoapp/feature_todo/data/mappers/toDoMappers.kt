@@ -11,7 +11,8 @@ fun Todo.toTodoDto() : TodoDto {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        archived = archived,
+        isSynced = isSynced
     )
 }
 
@@ -22,7 +23,8 @@ fun Todo.toTodoEntity() : TodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        archived = archived,
+        isSynced = isSynced
     )
 }
 
@@ -34,7 +36,8 @@ fun TodoEntity.toTodo() : Todo{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        archived = archived,
+        isSynced = isSynced
     )
 }
 
@@ -57,7 +60,8 @@ fun TodoEntity.toTodoDtO() : TodoDto{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        archived = archived,
+        isSynced = isSynced
     )
 }
 
@@ -68,7 +72,8 @@ fun TodoDto.toTodoEntity() : TodoEntity{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        archived = archived,
+        isSynced = isSynced
     )
 }
 

@@ -5,11 +5,12 @@ import androidx.room.PrimaryKey
 
 @Entity("todo")
 data class TodoEntity(
-    @PrimaryKey( autoGenerate = false )
-    val id: Long,
+    @PrimaryKey( autoGenerate = true )
+    val id: Long = 0L,
     val title: String,
     val description: String,
     val timeStamp: Long,
     val completed: Boolean,
     val archived: Boolean,
+    val isSynced: Boolean
 )

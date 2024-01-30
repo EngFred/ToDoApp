@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">ToDoApp</string>
+    <string name="app_name">TodoApp</string>
+    <string name="todo_completed_icon">todo_completed_icon</string>
+    <string name="todo_not_completed_icon">todo_not_completed_icon</string>
+    <string name="todo_achieved_icon">todo_achieved_icon</string>
+    <string name="todo_not_achieved_icon">todo_not_achieved_icon</string>
+    <string name="todo_delete_icon">todo_delete_icon</string>
+    <string name="drawer_item_selected_icon">drawer_item_selected_icon</string>
+    <string name="add_todo_icon">add_todo_icon</string>
+    <string name="open_drawer_menu_icon">open_drawer_menu_icon</string>
+    <string name="close_drawer_menu_icon">close_drawer_menu_icon</string>
+    <string name="screen_background_image">screen_background_image</string>
+    <string name="logo_image_icon">logo_image_icon</string>
 </resources>

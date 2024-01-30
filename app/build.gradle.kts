@@ -60,6 +60,7 @@ dependencies {
     val hiltComposeNavigationVersion = "1.1.0"
     val coroutinesVersion = "1.7.3"
     val roomVersion = "2.6.1"
+    val workerVersion = "2.9.0"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -77,8 +78,11 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    //firebase real time database
     implementation("com.google.firebase:firebase-database:20.3.0")
 
+    // Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:$workerVersion")
 
     //dagger-hilt
     implementation("com.google.dagger:hilt-android:${hiltVersion}")

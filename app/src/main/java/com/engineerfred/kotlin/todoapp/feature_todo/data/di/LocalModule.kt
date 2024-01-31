@@ -2,6 +2,8 @@ package com.engineerfred.kotlin.todoapp.feature_todo.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.MIGRATION_1_2
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.MIGRATION_2_3
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase.Companion.DATABASE_NAME
 import dagger.Module
@@ -22,7 +24,7 @@ object LocalModule {
             context,
             TodoDatabase::class.java,
             DATABASE_NAME
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).fallbackToDestructiveMigration().build()
 
     @Singleton
     @Provides

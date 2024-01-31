@@ -14,23 +14,24 @@ fun AchieveButton(
     modifier: Modifier = Modifier,
     onAchieveClicked: () -> Unit,
     achieved: Boolean,
-    color: Color,
+    color: Color
 ) {
 
-    IconButton(onClick = { onAchieveClicked.invoke() }, modifier = modifier) {
+    IconButton(
+        onClick = { onAchieveClicked.invoke() },
+        modifier = modifier
+    ) {
         if ( achieved ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_archive),
                 contentDescription = stringResource(id = R.string.todo_achieved_icon),
                 tint = color,
-//                modifier = modifier.size(48.dp)
             )
         } else {
             Icon(
                 painter = painterResource(id = R.drawable.ic_unarchive),
                 contentDescription = stringResource(id = R.string.todo_not_achieved_icon),
                 tint = color,
-//                modifier = modifier.size(48.dp)
             )
         }
     }

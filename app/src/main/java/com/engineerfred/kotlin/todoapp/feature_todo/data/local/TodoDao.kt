@@ -19,7 +19,7 @@ interface TodoDao {
     suspend fun addAllRemoteTodos( todos : List<TodoEntity> )
 
     @Upsert
-    suspend fun addUpdateTodo(todo: TodoEntity )
+    suspend fun addUpdateTodo(todo: TodoEntity ) : Long
 
     @Delete
     suspend fun deleteTodo( todo: TodoEntity )

@@ -36,9 +36,10 @@ fun TodoCard(
     onDeleteClicked: () -> Unit,
     onAchieveClicked: () -> Unit,
     onCardClicked: () -> Unit,
-    onCompletedClicked: () -> Unit,
+    onCompletedClicked: () -> Unit
 ) {
     val todoColors = getTodoColors(todo = todo)
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -77,7 +78,11 @@ fun TodoCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = formatTodoTime(todo.timeStamp), modifier.weight(1f).padding(start = 19.dp), fontSize = 12.sp, color = Color.DarkGray)
-                AchieveButton(onAchieveClicked = { onAchieveClicked.invoke() }, achieved = todo.archived, color = todoColors.achieveIconColor )
+                AchieveButton(
+                    onAchieveClicked = { onAchieveClicked.invoke() },
+                    achieved = todo.archived,
+                    color = todoColors.achieveIconColor
+                )
                 DeleteButton( onDeleteClicked = onDeleteClicked )
             }
         }
@@ -100,8 +105,10 @@ fun TodoCardPreview() {
             ),
             onDeleteClicked = { /*TODO*/ },
             onAchieveClicked = { /*TODO*/ },
-            onCardClicked = { /*TODO*/ }) {
+            onCardClicked = { /*TODO*/ },
+            onCompletedClicked = {
 
-        }
+            }
+        )
     }
 }

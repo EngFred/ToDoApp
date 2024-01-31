@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,12 +53,33 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodosScreen() {
+fun TodosListScreen(
+    onCreateTask: () -> Unit,
+    onUpdateTask: ( todoId:Long ) -> Unit
+) {
 
     val todosListViewModel = hiltViewModel<TodosListViewModel>()
+    val context = LocalContext.current
 
     val todosState = todosListViewModel.todosState.collectAsState().value
-    
+    val todoUpdatingState = todosListViewModel.todoUpdateState.collectAsState().value
+    val todoDeletingState = todosListViewModel.todoDeleteState.collectAsState().value
+
+//    when( todoUpdatingState ) {
+//        is Resource.Failure -> {
+//            if ( !todoUpdatingState.errorMessage.contains("ConnectException") ) {
+//                LaunchedEffect( true ) {
+//                    Toast.makeText(context, "Failed to update todo!", Toast.LENGTH_LONG).show()
+//                }
+//            }
+//        }
+//        else -> Unit
+//    }
+
+//    val isUpdating by rememberSaveable {
+//        mutableStateOf( (todoUpdatingState is Resource.Loading) || (todoDeletingState is Resource.Loading) )
+//    }
+
     val snackbarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -101,7 +123,7 @@ fun TodosScreen() {
                             DrawerHeader()
                             Text(
                                 text = "Sort by:",
-                                modifier = Modifier.padding(top = 16.dp, start=30.dp, bottom= 16.dp,),
+                                modifier = Modifier.padding(top = 16.dp, start=30.dp, bottom= 16.dp),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -115,7 +137,9 @@ fun TodosScreen() {
                             )
                             Text(
                                 text = "Developed by Engineer Fred @2024",
-                                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
                                 textAlign = TextAlign.Center,
                                 color = Color.Gray,
                                 fontSize = 13.sp,
@@ -127,7 +151,7 @@ fun TodosScreen() {
                     Scaffold(
                         floatingActionButton = {
                             FloatingActionButton(
-                                onClick = { /*TODO*/ },
+                                onClick = { onCreateTask.invoke() },
                                 shape = CircleShape,
                                 containerColor = MaterialTheme.colorScheme.primary
                             ) {
@@ -185,14 +209,19 @@ fun TodosScreen() {
                                             )
                                         }
                                     }
-                                },
-                                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+                                }
                             )
                         },
                         snackbarHost = { SnackbarHost( hostState = snackbarHostState ) }
                     ) {
 
                         Box(modifier = Modifier.fillMaxSize()) {
+//                            AnimatedVisibility( visible = isUpdating ) {
+//                                LinearProgressIndicator( modifier = Modifier
+//                                    .align(Alignment.TopStart)
+//                                    .fillMaxWidth()
+//                                    .padding(bottom = 10.dp, top = 66.dp) )
+//                            }
                             Image(
                                 painter = screenBackgroundImage,
                                 contentDescription = stringResource(id = R.string.screen_background_image),
@@ -205,7 +234,16 @@ fun TodosScreen() {
                                 todosListViewModel = todosListViewModel,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(top = 66.dp)
+                                    .padding(top = 66.dp),
+                                onAchieved = {
+                                    todosListViewModel.onEvent( TodosListEvents.TodoArchived(it) )
+                                }, onCompleted = {
+                                    todosListViewModel.onEvent( TodosListEvents.TodoCompletedClicked(it) )
+                                }, onDeleted = {
+                                    todosListViewModel.onEvent( TodosListEvents.DeleteTodoClicked(it) )
+                                }, onCardClicked = {
+                                    onUpdateTask.invoke(it)
+                                }
                             )
                         }
                     }
@@ -233,5 +271,4 @@ fun TodosScreen() {
             Resource.Undefined -> Unit
         }
     }
-
 }

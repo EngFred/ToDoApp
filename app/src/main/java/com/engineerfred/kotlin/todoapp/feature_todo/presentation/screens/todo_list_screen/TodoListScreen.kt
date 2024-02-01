@@ -3,7 +3,9 @@ package com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_l
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,8 +64,6 @@ fun TodosListScreen(
     val context = LocalContext.current
 
     val todosState = todosListViewModel.todosState.collectAsState().value
-    val todoUpdatingState = todosListViewModel.todoUpdateState.collectAsState().value
-    val todoDeletingState = todosListViewModel.todoDeleteState.collectAsState().value
 
 //    when( todoUpdatingState ) {
 //        is Resource.Failure -> {
@@ -266,6 +266,23 @@ fun TodosListScreen(
                             .align(Alignment.Center),
                         color = MaterialTheme.colorScheme.error
                     )
+                    Row(
+                        modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(26.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        FloatingActionButton(
+                            onClick = { onCreateTask.invoke() },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_add),
+                                contentDescription = stringResource(id = R.string.save_todo_icon),
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
                 }
             }
             Resource.Undefined -> Unit

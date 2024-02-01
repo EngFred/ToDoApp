@@ -4,12 +4,11 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedToPostTodoDao {
     @Query("SELECT * FROM saved_to_post_todos")
-    fun getAllTodos() : Flow<List<SavedToPostTodoEntity>>
+    suspend fun getAllTodos() : List<SavedToPostTodoEntity>
 
     @Query("SELECT * FROM saved_to_post_todos WHERE id = :id")
     suspend fun getTodoById( id: Long ) : SavedToPostTodoEntity?

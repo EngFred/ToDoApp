@@ -2,7 +2,6 @@ package com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_l
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -30,25 +29,26 @@ fun TodosList(
 
     LaunchedEffect(Unit) {
         Log.v("TodoApplication", "Unsynced todos are ${todos.filter { !it.isSynced }.size}")
-        todos.filter { !it.isSynced }.forEach {
-            Log.v("TodoApplication", it.title)
-        }
     }
 
     LazyColumn( modifier ) {
-        items( items = filterTodos ) {
+        items(
+            count = filterTodos.size,
+            key = { filterTodos[it].id },
+        ) {
+            val todo = filterTodos[it]
             TodoCard(
-                todo = it,
+                todo = todo,
                 onDeleteClicked = {
                      showDeleteAlertDialog(
-                         task = it.title,
+                         task = todo.title,
                          context = context,
-                         onDeleteClicked = { onDeleted.invoke(it) }
+                         onDeleteClicked = { onDeleted.invoke(todo) }
                      )
                 },
-                onAchieveClicked = { onAchieved.invoke(it) },
-                onCardClicked = { onCardClicked.invoke(it.id) },
-                onCompletedClicked = { onCompleted.invoke(it) }
+                onAchieveClicked = { onAchieved.invoke(todo) },
+                onCardClicked = { onCardClicked.invoke(todo.id) },
+                onCompletedClicked = { onCompleted.invoke(todo) }
             )
         }
     }

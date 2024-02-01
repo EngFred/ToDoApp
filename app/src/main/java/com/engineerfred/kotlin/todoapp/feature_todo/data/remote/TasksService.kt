@@ -7,7 +7,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Url
 
-interface TodoService {
+interface TasksService {
 
     @GET("todos.json")
     suspend fun getAllRemoteTodos() : List<TodoDto>

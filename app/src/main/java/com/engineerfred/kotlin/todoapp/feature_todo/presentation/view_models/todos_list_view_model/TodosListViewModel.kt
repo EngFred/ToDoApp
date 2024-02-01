@@ -11,7 +11,8 @@ import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.AddTodoUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.DeleteTodoUseCase
-import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllSavedToPostTasksUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTasksCreatedWhileOfflineUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTasksDeletedWhileOfflineUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTodosUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.UpdateTodoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +28,8 @@ class TodosListViewModel @Inject constructor(
     private val updateTodoUseCase: UpdateTodoUseCase,
     private val deleteTodoUseCase: DeleteTodoUseCase,
     private val addTodoUseCase: AddTodoUseCase,
-    private val getAllSavedToPostTasksUseCase: GetAllSavedToPostTasksUseCase
+    private val getAllTasksCreatedWhileOfflineUseCase: GetAllTasksCreatedWhileOfflineUseCase,
+    private val getAllTasksDeletedWhileOfflineUseCase: GetAllTasksDeletedWhileOfflineUseCase
 ) : ViewModel() {
     private val _todosState = MutableStateFlow<Resource<List<Todo>>>(Resource.Loading)
     val todosState = _todosState.asStateFlow()
@@ -100,15 +102,27 @@ class TodosListViewModel @Inject constructor(
                 _todosState.value = it
             }
         }
-        getAllSavedToPostTodos()
+        getAllTaskCreatedWhileOffline()
+        getAllTasksDeletedWhileOffline()
     }
 
-    private fun getAllSavedToPostTodos() {
+    private fun getAllTaskCreatedWhileOffline() {
         viewModelScope.launch {
-            getAllSavedToPostTasksUseCase.invoke().collect{
-                if ( it is Resource.Success ) {
-                    Log.v("SavedToPost", "Saved To Post todos in the todos model are ${it.result.size}")
-                    Log.v("SavedToPost", "The first task in the 'Saved To Post' database table has a title ${it.result[0].title}")
+            getAllTasksCreatedWhileOfflineUseCase.invoke().collect{
+                when( it ) {
+                    is Resource.Success -> Log.wtf("OfflineAction", "Task created while offline: ${it.result.size} ")
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    private fun getAllTasksDeletedWhileOffline() {
+        viewModelScope.launch {
+            getAllTasksDeletedWhileOfflineUseCase.invoke().collect{
+                when( it ) {
+                    is Resource.Success -> Log.wtf("OfflineAction", "Task deleted while offline: ${it.result.size} ")
+                    else -> Unit
                 }
             }
         }

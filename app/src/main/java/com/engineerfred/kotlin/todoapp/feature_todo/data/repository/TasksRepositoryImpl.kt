@@ -3,18 +3,18 @@ package com.engineerfred.kotlin.todoapp.feature_todo.data.repository
 import android.util.Log
 import com.engineerfred.kotlin.todoapp.core.util.Resource
 import com.engineerfred.kotlin.todoapp.feature_todo.data.di.IoDispatcher
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.SavedToPostTodoEntity
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toDeletedTodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toSaveToPostTodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toSavedToPostTodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodo
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoDtO
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoDto
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoEntity
-import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TodoService
+import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TasksService
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
-import com.engineerfred.kotlin.todoapp.feature_todo.domain.repository.TodosRepository
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.repository.TasksRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.NonCancellable
@@ -29,11 +29,11 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 import javax.inject.Inject
 
-class TodosRepositoryImpl @Inject constructor (
-    private val service: TodoService,
-    private val cache: TodoDatabase,
+class TasksRepositoryImpl @Inject constructor (
+    private val service: TasksService,
+    private val cache: TasksDatabase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
-) : TodosRepository {
+) : TasksRepository {
 
     companion object {
         const val TAG = "TodoApplication"
@@ -97,10 +97,10 @@ class TodosRepositoryImpl @Inject constructor (
             withContext(NonCancellable) {
                 Log.i(TAG, "Todo is added to cache! Syncing in progress...")
                 val url = "todos/${newTaskId}.json"
-                service.addTodo(url, todoEntity.toTodoDtO().copy( isSynced = true ))
+                service.addTodo(url, todoEntity.toTodoDtO().copy( id = newTaskId, isSynced = true ))
                 Log.i(TAG, "The new todo was synced successfully!")
                 Log.i(TAG, "Updating the todo in cache!")
-                cache.todoDao.addUpdateTodo( todoEntity.copy( isSynced = true ) )
+                cache.todoDao.addUpdateTodo( todoEntity.copy( id = newTaskId, isSynced = true ) )
                 Log.v(TAG, "Your Todo was cached & synced successfully!")
             }
             emit(Resource.Undefined)
@@ -109,17 +109,7 @@ class TodosRepositoryImpl @Inject constructor (
             if ( it is ConnectException || it is HttpException || it is UnknownHostException ) {
                 withContext(NonCancellable) {
                     Log.i(TAG, "Todo is saved in cache but not in the service! it's currently Stored in the 'saved to post' table for later creation in the service as well.")
-                    val saveToPostTask = SavedToPostTodoEntity(
-                        id = newTaskId,
-                        title = todoEntity.title,
-                        description = todoEntity.description,
-                        timeStamp = todoEntity.timeStamp,
-                        completed = todoEntity.completed,
-                        archived = todoEntity.completed,
-                        isSynced = false
-                    )
-                    Log.i("SaveToPost", "The new task id inside the catch block for save to Post is $newTaskId")
-                    cache.savedToPostTodoDao.addTodo( saveToPostTask )
+                    cache.savedToPostTodoDao.addTodo( todoEntity.toSaveToPostTodoEntity().copy( id = newTaskId ) )
                     Log.v(TAG, "Todo has been saved in the 'saved to post' table successfully for saving in the service!")
                 }
             }
@@ -174,20 +164,36 @@ class TodosRepositoryImpl @Inject constructor (
         }
     }
 
-    override fun getSavedToPostTodos(): Flow<Resource<List<Todo>>> {
+    override fun getAllTodosThatWereCreateWhileOffline(): Flow<Resource<List<Todo>>> {
         return flow {
             emit(Resource.Loading)
-            cache.savedToPostTodoDao.getAllTodos().collect{
-                if ( it.isEmpty() ) {
-                    Log.d("SavedToPost", "No task was found in the database table 'Saved to Post' ")
-                    emit(Resource.Undefined)
-                } else {
-                    emit(Resource.Success( it.map { it.toTodo() } ))
-                    Log.d("SavedToPost", "${it.size} tasks were found in database table 'Saved to Post' ")
-                }
+            val tasks = cache.savedToPostTodoDao.getAllTodos()
+            if ( tasks.isEmpty() ) {
+                Log.d("OfflineAction", "No task was added while offline!")
+                emit(Resource.Undefined)
+            } else {
+                emit(Resource.Success( tasks.map { it.toTodo() } ))
+                Log.d("OfflineAction", "Task added while offline: ${tasks.size} ")
             }
         }.flowOn(ioDispatcher).catch {
-            Log.i(TAG, "Getting Saved to Post todo tasks: $it")
+            Log.i("OfflineAction", "Getting Tasks that were added while offline: $it")
+            emit(Resource.Failure("$it"))
+        }
+    }
+
+    override fun getAllTodosThatWereDeletedWhileOffline(): Flow<Resource<List<Todo>>> {
+        return flow {
+            emit(Resource.Loading)
+            val tasks = cache.deletedTodoDao.getAllDeletedTodos()
+            if ( tasks.isEmpty() ) {
+                Log.d("OfflineAction", "No task was deleted while offline!")
+                emit(Resource.Undefined)
+            } else {
+                Log.d("OfflineAction", "Task deleted while offline: ${tasks.size} ")
+                emit(Resource.Success( tasks.map { it.toTodo() } ))
+            }
+        }.flowOn(ioDispatcher).catch {
+            Log.i("OfflineAction", "Getting Tasks that were deleted while offline: $it")
             emit(Resource.Failure("$it"))
         }
     }

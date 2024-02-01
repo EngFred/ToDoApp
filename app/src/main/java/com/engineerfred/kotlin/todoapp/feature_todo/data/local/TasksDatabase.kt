@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase
     version = 1,
     exportSchema = false
 )
-abstract class TodoDatabase : RoomDatabase() {
+abstract class TasksDatabase : RoomDatabase() {
     abstract val todoDao: TodoDao
     abstract val deletedTodoDao: DeletedTodoDao
     abstract val savedToPostTodoDao: SavedToPostTodoDao

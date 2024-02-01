@@ -126,3 +126,39 @@ fun Todo.toSavedToPostTodoEntity() : SavedToPostTodoEntity{
     )
 }
 
+fun DeletedTodoEntity.toTodo() : Todo {
+    return Todo(
+        id = id,
+        title = title,
+        description = description,
+        timeStamp = timeStamp,
+        completed = completed,
+        archived = archived,
+        isSynced = isSynced
+    )
+}
+
+fun SavedToPostTodoEntity.toTodoDto() : TodoDto{
+    return TodoDto(
+        id = id,
+        title = title,
+        description = description,
+        timeStamp = timeStamp,
+        completed = completed,
+        archived = archived,
+        isSynced = isSynced
+    )
+}
+
+fun TodoEntity.toTodoDto() : TodoDto{
+    return TodoDto(
+        id = id,
+        title = title,
+        description = description,
+        timeStamp = timeStamp,
+        completed = completed,
+        archived = archived,
+        isSynced = isSynced
+    )
+}
+

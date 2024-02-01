@@ -2,8 +2,9 @@ package com.engineerfred.kotlin.todoapp.feature_todo.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -12,13 +13,16 @@ interface TodoDao {
     @Query("SELECT * FROM todo")
     fun getAllTodos() : Flow<List<TodoEntity>>
 
+    @Query("SELECT * FROM todo WHERE isSynced = 0")
+    suspend fun getUnsyncedTodos() : List<TodoEntity>
+
     @Query("SELECT * FROM toDo WHERE id = :id")
     fun getTodoById(id: Long ) : Flow<TodoEntity?>
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAllRemoteTodos( todos : List<TodoEntity> )
 
-    @Upsert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addUpdateTodo(todo: TodoEntity ) : Long
 
     @Delete

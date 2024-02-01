@@ -1,10 +1,10 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.data.di
 
 import com.engineerfred.kotlin.todoapp.core.util.Constants.BASE_URL
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase
-import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TodoService
-import com.engineerfred.kotlin.todoapp.feature_todo.data.repository.TodosRepositoryImpl
-import com.engineerfred.kotlin.todoapp.feature_todo.domain.repository.TodosRepository
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TasksService
+import com.engineerfred.kotlin.todoapp.feature_todo.data.repository.TasksRepositoryImpl
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.repository.TasksRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +23,7 @@ object RemoteModule {
 
     @Provides
     @Singleton
-    fun provideRetrofitInstance() : TodoService {
+    fun provideRetrofitInstance() : TasksService {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         }
@@ -35,13 +35,13 @@ object RemoteModule {
             .addConverterFactory(GsonConverterFactory.create())
             .client(httpClient.build())
             .build()
-            .create(TodoService::class.java)
+            .create(TasksService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideTodosRepository( service: TodoService, cache: TodoDatabase, @IoDispatcher ioDispatcher: CoroutineDispatcher ) : TodosRepository {
-        return  TodosRepositoryImpl(  service, cache, ioDispatcher )
+    fun provideTodosRepository(service: TasksService, cache: TasksDatabase, @IoDispatcher ioDispatcher: CoroutineDispatcher ) : TasksRepository {
+        return  TasksRepositoryImpl(  service, cache, ioDispatcher )
     }
 
 }

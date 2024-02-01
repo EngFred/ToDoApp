@@ -81,8 +81,13 @@ dependencies {
     //firebase real time database
     implementation("com.google.firebase:firebase-database:20.3.0")
 
-    // Kotlin + coroutines
+    //accompanist library
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.35.0-alpha")
+
+    // Kotlin + coroutines -workerManager
     implementation("androidx.work:work-runtime-ktx:$workerVersion")
+    implementation("androidx.hilt:hilt-common:1.1.0")
 
     //dagger-hilt
     implementation("com.google.dagger:hilt-android:${hiltVersion}")

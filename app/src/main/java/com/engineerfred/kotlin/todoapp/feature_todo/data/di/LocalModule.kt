@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.MIGRATION_1_2
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.MIGRATION_2_3
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoDatabase.Companion.DATABASE_NAME
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase.Companion.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,12 +22,12 @@ object LocalModule {
     fun provideToDoDatabase( @ApplicationContext context: Context )  =
         Room.databaseBuilder(
             context,
-            TodoDatabase::class.java,
+            TasksDatabase::class.java,
             DATABASE_NAME
         ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).fallbackToDestructiveMigration().build()
 
     @Singleton
     @Provides
-    fun provideToDoDao( todoDatabase: TodoDatabase ) =
-        todoDatabase.todoDao
+    fun provideToDoDao(tasksDatabase: TasksDatabase ) =
+        tasksDatabase.todoDao
 }

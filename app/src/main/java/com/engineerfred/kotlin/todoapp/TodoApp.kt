@@ -7,7 +7,7 @@ import androidx.work.Configuration
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TasksService
 import com.engineerfred.kotlin.todoapp.feature_todo.data.worker.TasksWorker
 import dagger.hilt.android.HiltAndroidApp

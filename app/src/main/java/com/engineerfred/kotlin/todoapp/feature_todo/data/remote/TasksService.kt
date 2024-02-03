@@ -10,7 +10,7 @@ import retrofit2.http.Url
 interface TasksService {
 
     @GET("todos.json")
-    suspend fun getAllRemoteTodos() : List<TodoDto>
+    suspend fun getAllRemoteTodos() : Map<String, TodoDto>
 
     @PUT
     suspend fun addTodo( @Url url: String, @Body todo: TodoDto )

@@ -1,4 +1,4 @@
-package com.engineerfred.kotlin.todoapp.feature_todo.data.local
+package com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

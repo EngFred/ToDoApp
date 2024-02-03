@@ -1,26 +1,31 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.engineerfred.kotlin.todoapp.core.util.Resource
+import com.engineerfred.kotlin.todoapp.feature_todo.data.di.IoDispatcher
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.TasksOrderPreferences
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.AddTodoUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.ChangeAppThemeUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.ChangeTasksOrderUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.DeleteTodoUseCase
-import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTasksCreatedWhileOfflineUseCase
-import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTasksDeletedWhileOfflineUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAllTodosUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetAppThemeUseCase
+import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.GetTasksOrderUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.UpdateTodoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class TodosListViewModel @Inject constructor(
@@ -28,8 +33,11 @@ class TodosListViewModel @Inject constructor(
     private val updateTodoUseCase: UpdateTodoUseCase,
     private val deleteTodoUseCase: DeleteTodoUseCase,
     private val addTodoUseCase: AddTodoUseCase,
-    private val getAllTasksCreatedWhileOfflineUseCase: GetAllTasksCreatedWhileOfflineUseCase,
-    private val getAllTasksDeletedWhileOfflineUseCase: GetAllTasksDeletedWhileOfflineUseCase
+    private val getAppThemeUseCase: GetAppThemeUseCase,
+    private val changeAppThemeUseCase: ChangeAppThemeUseCase,
+    private val changeTasksOrderUseCase: ChangeTasksOrderUseCase,
+    private val getTasksOrderUseCase: GetTasksOrderUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     private val _todosState = MutableStateFlow<Resource<List<Todo>>>(Resource.Loading)
     val todosState = _todosState.asStateFlow()
@@ -47,7 +55,7 @@ class TodosListViewModel @Inject constructor(
     private var todoJob: Job? = null
 
     init {
-        getAllTodos()
+        initialize()
     }
 
 
@@ -69,13 +77,8 @@ class TodosListViewModel @Inject constructor(
                 }
             }
             is TodosListEvents.TodosSortClicked -> {
-//                val stateOrderAlreadyMatchesEventOrder = uiState.todosOrder::class == event.todosOrder::class &&
-//                        uiState.todosOrder.showAchieved == event.todosOrder.showAchieved &&
-//                        uiState.todosOrder.sortingDirection == event.todosOrder.sortingDirection
-//                if( stateOrderAlreadyMatchesEventOrder ) return else {
-//                    uiState = uiState.copy( todosOrder = event.todosOrder  )
-//                }
                 uiState = uiState.copy( todosOrder = event.todosOrder  )
+                saveTasksOrder( uiState.todosOrder )
             }
 
             is TodosListEvents.UndoTodoDeleteClicked -> {
@@ -92,6 +95,93 @@ class TodosListViewModel @Inject constructor(
                     }
                 }
             }
+            is TodosListEvents.OnThemeChanged -> {
+                uiState = uiState.copy( isLightTheme =  !uiState.isLightTheme )
+                changeAppTheme()
+            }
+        }
+    }
+
+
+    private fun initialize() {
+        getAppTheme()
+        getTasksOrder()
+        getAllTodos()
+    }
+
+    private fun getTasksOrder() {
+        viewModelScope.launch {
+            var tasksOrder = uiState.todosOrder
+            getTasksOrderUseCase.invoke().collect{
+                when (it.sortingDirection) {
+                    "a_z" -> {
+                        when (it.sortingType) {
+                            "time" -> {
+                                tasksOrder = when {
+                                    tasksOrder.showAchieved -> {
+                                        TodosOrder.Time( TodosSortingDirection.AtoZ, true )
+                                    } else -> TodosOrder.Time( TodosSortingDirection.AtoZ, false)
+                                }
+                            }
+                            "title" -> {
+                                tasksOrder = when {
+                                    it.showAchieved -> {
+                                        TodosOrder.Title( TodosSortingDirection.AtoZ, true )
+                                    } else -> TodosOrder.Title( TodosSortingDirection.AtoZ, false)
+                                }
+                            }
+                            "completed" -> {
+                                tasksOrder = when {
+                                    it.showAchieved -> {
+                                        TodosOrder.Completed( TodosSortingDirection.AtoZ, true )
+                                    } else -> TodosOrder.Completed( TodosSortingDirection.AtoZ, false)
+                                }
+                            }
+                        }
+                    }
+                    "z_a" -> {
+                        when (it.sortingType) {
+                            "time" -> {
+                                tasksOrder = when {
+                                    it.showAchieved -> {
+                                        TodosOrder.Time( TodosSortingDirection.ZtoA, true )
+                                    } else -> TodosOrder.Time( TodosSortingDirection.ZtoA, false)
+                                }
+                            }
+                            "title" -> {
+                                tasksOrder = when {
+                                    it.showAchieved -> {
+                                        TodosOrder.Title( TodosSortingDirection.ZtoA, true )
+                                    } else -> TodosOrder.Title( TodosSortingDirection.ZtoA, false)
+                                }
+                            }
+                            "completed" -> {
+                                tasksOrder = when {
+                                    it.showAchieved -> {
+                                        TodosOrder.Completed( TodosSortingDirection.ZtoA, true )
+                                    } else -> TodosOrder.Completed( TodosSortingDirection.ZtoA, false)
+                                }
+                            }
+                        }
+                    }
+                }
+                uiState = uiState.copy( todosOrder = tasksOrder )
+            }
+        }
+    }
+
+
+    private fun changeAppTheme() {
+        viewModelScope.launch( ioDispatcher ) {
+            changeAppThemeUseCase.invoke( uiState.isLightTheme )
+        }
+    }
+
+    private fun getAppTheme() {
+        viewModelScope.launch {
+            getAppThemeUseCase.invoke().collect{
+                uiState = uiState.copy( isLightTheme = it )
+            }
         }
     }
 
@@ -102,30 +192,32 @@ class TodosListViewModel @Inject constructor(
                 _todosState.value = it
             }
         }
-        getAllTaskCreatedWhileOffline()
-        getAllTasksDeletedWhileOffline()
     }
 
-    private fun getAllTaskCreatedWhileOffline() {
+    private fun saveTasksOrder( todosOrder: TodosOrder ) {
+        val tasksOrderPreferences = TasksOrderPreferences(
+            sortingType = when (todosOrder) {
+                is TodosOrder.Title -> "title"
+                is TodosOrder.Time -> "time"
+                is TodosOrder.Completed -> "completed"
+            },
+            sortingDirection = when( todosOrder.sortingDirection ) {
+                TodosSortingDirection.AtoZ -> "a_z"
+                TodosSortingDirection.ZtoA -> "z_a"
+            },
+            showAchieved = todosOrder.showAchieved
+        )
         viewModelScope.launch {
-            getAllTasksCreatedWhileOfflineUseCase.invoke().collect{
-                when( it ) {
-                    is Resource.Success -> Log.wtf("OfflineAction", "Task created while offline: ${it.result.size} ")
-                    else -> Unit
-                }
-            }
+            changeTasksOrderUseCase.invoke(tasksOrderPreferences)
         }
     }
-
-    private fun getAllTasksDeletedWhileOffline() {
-        viewModelScope.launch {
-            getAllTasksDeletedWhileOfflineUseCase.invoke().collect{
-                when( it ) {
-                    is Resource.Success -> Log.wtf("OfflineAction", "Task deleted while offline: ${it.result.size} ")
-                    else -> Unit
-                }
-            }
-        }
-    }
-
 }
+
+
+
+//                val stateOrderAlreadyMatchesEventOrder = uiState.todosOrder::class == event.todosOrder::class &&
+//                        uiState.todosOrder.showAchieved == event.todosOrder.showAchieved &&
+//                        uiState.todosOrder.sortingDirection == event.todosOrder.sortingDirection
+//                if( stateOrderAlreadyMatchesEventOrder ) return else {
+//                    uiState = uiState.copy( todosOrder = event.todosOrder  )
+//                }

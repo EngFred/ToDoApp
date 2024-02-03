@@ -9,9 +9,11 @@
     <string name="add_todo_icon">add_todo_icon</string>
     <string name="save_todo_icon">save_todo_icon</string>
     <string name="open_drawer_menu_icon">open_drawer_menu_icon</string>
+    <string name="search_icon">search_icon</string>
     <string name="close_drawer_menu_icon">close_drawer_menu_icon</string>
     <string name="screen_background_image">screen_background_image</string>
     <string name="logo_image_icon">logo_image_icon</string>
     <string name="back_icon">back_icon</string>
     <string name="error_icon">error_icon</string>
+    <string name="theme_icon">theme_icon</string>
 </resources>

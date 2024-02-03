@@ -80,7 +80,7 @@ fun ToDoAppTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colors = if (!useDarkTheme) {
+    val colors = if (useDarkTheme) {
         LightColors
     } else {
         DarkColors
@@ -89,8 +89,7 @@ fun ToDoAppTheme(
     val view = LocalView.current
     if ( !view.isInEditMode ) {
         val sysUiController = rememberSystemUiController()
-        val systemBarsColors = if ( !isSystemInDarkTheme() ) Color(0xFF0061A4) else MaterialTheme.colorScheme.onBackground
-        val navigationBarColor = if ( isSystemInDarkTheme() ) Color(0xFF2196F3) else MaterialTheme.colorScheme.onBackground
+        val systemBarsColors = if ( useDarkTheme ) Color(0xFF0061A4) else Color(0xFF1A1C1E)
 
         SideEffect {
             sysUiController.setSystemBarsColor(systemBarsColors)

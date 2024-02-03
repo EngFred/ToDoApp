@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.engineerfred.kotlin.todoapp.core.presentation.components.AchieveButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.CompleteButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.DeleteButton
-import com.engineerfred.kotlin.todoapp.core.presentation.components.getTodoColors
+import com.engineerfred.kotlin.todoapp.core.util.getTodoColors
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme.ToDoAppTheme
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.util.formatTodoTime
@@ -36,7 +36,8 @@ fun TodoCard(
     onDeleteClicked: () -> Unit,
     onAchieveClicked: () -> Unit,
     onCardClicked: () -> Unit,
-    onCompletedClicked: () -> Unit
+    onCompletedClicked: () -> Unit,
+    isDarkTheme: Boolean
 ) {
     val todoColors = getTodoColors(todo = todo)
 
@@ -64,7 +65,8 @@ fun TodoCard(
                 CompleteButton(onCompleteClicked = {onCompletedClicked.invoke()}, completed = todo.completed, color = todoColors.completedIconColor)
                 Text(text = todo.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp, color = todoColors.textColor)
             }
-            Text(text = todo.description,
+            Text(
+                text = todo.description,
                 modifier.fillMaxWidth()
                     .padding(horizontal = 15.dp),
                 textAlign = TextAlign.Start,
@@ -77,7 +79,12 @@ fun TodoCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = formatTodoTime(todo.timeStamp), modifier.weight(1f).padding(start = 19.dp), fontSize = 12.sp, color = Color.DarkGray)
+                Text(
+                    text = formatTodoTime(todo.timeStamp),
+                    modifier.weight(1f).padding(start = 19.dp),
+                    fontSize = 12.sp,
+                    color = if ( isDarkTheme ) Color.DarkGray else Color(0xFF8B5000)
+                )
                 AchieveButton(
                     onAchieveClicked = { onAchieveClicked.invoke() },
                     achieved = todo.archived,
@@ -106,9 +113,8 @@ fun TodoCardPreview() {
             onDeleteClicked = { /*TODO*/ },
             onAchieveClicked = { /*TODO*/ },
             onCardClicked = { /*TODO*/ },
-            onCompletedClicked = {
-
-            }
+            onCompletedClicked = {},
+            isDarkTheme = false
         )
     }
 }

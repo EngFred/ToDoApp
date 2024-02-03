@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.engineerfred.kotlin.todoapp.R
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_new_update_screen.components.SaveUpdateTodoBottomRow
@@ -44,6 +45,7 @@ import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.sav
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModel
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModelAssistedFactory
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModelFactory
+import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosListViewModel
 
 @Composable
 fun SaveUpdateTodoScreen(
@@ -58,6 +60,15 @@ fun SaveUpdateTodoScreen(
             saveUpdateTodoViewModelAssistedFactory, todoId
         )
     )
+
+    val todosListViewModel = hiltViewModel<TodosListViewModel>()
+
+    val bgColor =  if ( todosListViewModel.uiState.isLightTheme )  {
+        Color(0xFF0061A4)
+    } else {
+        Color(0xFF1A1C1E)
+    }
+
 
     if (saveUpdateTodoViewModel.saveUpdateCompleted) onBackClicked.invoke()
 
@@ -81,7 +92,8 @@ fun SaveUpdateTodoScreen(
         ) {
             SaveUpdateTodoTopRow(
                 title = if (todoId == -1L) "Create Task" else "Update Task",
-                onBackClicked = onBackClicked
+                onBackClicked = onBackClicked,
+                bgColor = bgColor
             )
             Column(
                 Modifier
@@ -191,7 +203,7 @@ fun SaveUpdateTodoScreen(
                 },
                 onSave = {
                     saveUpdateTodoViewModel.onEvent(SaveUpdateTodoScreenEvents.SaveClicked)
-                }
+                }, bgColor = bgColor
             )
         }
     }

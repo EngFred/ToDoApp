@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,7 +20,7 @@ import com.engineerfred.kotlin.todoapp.R
 import com.engineerfred.kotlin.todoapp.core.presentation.components.AchieveButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.CompleteButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.DeleteButton
-import com.engineerfred.kotlin.todoapp.core.presentation.components.getTodoColors
+import com.engineerfred.kotlin.todoapp.core.util.getTodoColors
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme.ToDoAppTheme
 
@@ -32,6 +32,7 @@ fun SaveUpdateTodoBottomRow(
     onAchieved: () -> Unit,
     onDeleted: () -> Unit,
     onSave: () -> Unit,
+    bgColor: Color,
 ) {
 
     val todoColors = getTodoColors(todo = todo)
@@ -58,16 +59,15 @@ fun SaveUpdateTodoBottomRow(
         FloatingActionButton(
             onClick = { onSave.invoke() },
             shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = bgColor
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_save),
                 contentDescription = stringResource(id = R.string.save_todo_icon),
-                tint = MaterialTheme.colorScheme.onPrimary
+                tint = Color(0xFFFFFFFF)
             )
         }
     }
-
 }
 
 @Preview( showBackground = true )
@@ -85,8 +85,9 @@ fun BottomRowPreview() {
             ),
             onCompleted = { /*TODO*/ },
             onAchieved = { /*TODO*/ },
-            onDeleted = { /*TODO*/ }) {
-
-        }
+            onDeleted = { /*TODO*/ },
+            onSave = {},
+            bgColor = Color.Blue
+        )
     }
 }

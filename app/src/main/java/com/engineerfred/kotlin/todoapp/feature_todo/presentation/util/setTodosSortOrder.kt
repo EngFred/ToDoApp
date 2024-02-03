@@ -25,20 +25,20 @@ fun setTodosSortOrder(
                 is TodosOrder.Time -> {
                     when {
                         todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedByDescending { it.timeStamp }.filter { it.archived }
+                            todos.sortedBy { it.timeStamp }.filter { it.archived }
                         }
 
-                        else -> todos.sortedByDescending { it.timeStamp }
+                        else -> todos.sortedBy { it.timeStamp }
                     }
                 }
 
                 is TodosOrder.Completed -> {
                     when {
                         todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedByDescending { it.completed }.filter { it.archived }
+                            todos.sortedBy { it.completed }.filter { it.archived }
                         }
 
-                        else -> todos.sortedByDescending { it.completed }
+                        else -> todos.sortedBy { it.completed }
                     }
                 }
             }
@@ -59,20 +59,20 @@ fun setTodosSortOrder(
                 is TodosOrder.Time -> {
                     when {
                         todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedBy { it.timeStamp }.filter { it.archived }
+                            todos.sortedByDescending { it.timeStamp }.filter { it.archived }
                         }
 
-                        else -> todos.sortedBy { it.timeStamp }
+                        else -> todos.sortedByDescending { it.timeStamp }
                     }
                 }
 
                 is TodosOrder.Completed -> {
                     when {
                         todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedBy { it.completed }.filter { it.archived }
+                            todos.sortedByDescending { it.completed }.filter { it.archived }
                         }
 
-                        else -> todos.sortedBy { it.completed }
+                        else -> todos.sortedByDescending { it.completed }
                     }
                 }
             }

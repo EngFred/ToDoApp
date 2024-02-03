@@ -1,8 +1,8 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.data.mappers
 
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.DeletedTodoEntity
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.SavedToPostTodoEntity
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.DeletedTodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.SavedToPostTodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.TodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TodoDto
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 
@@ -54,7 +54,7 @@ fun TodoEntity.toTodo() : Todo{
     )
 }
 
-fun TodoEntity.toSaveToPostTodoEntity() : SavedToPostTodoEntity{
+fun TodoEntity.toSaveToPostTodoEntity() : SavedToPostTodoEntity {
     return SavedToPostTodoEntity(
         id = id,
         title = title,
@@ -90,7 +90,7 @@ fun TodoEntity.toTodoDtO() : TodoDto{
     )
 }
 
-fun TodoDto.toTodoEntity() : TodoEntity{
+fun TodoDto.toTodoEntity() : TodoEntity {
     return TodoEntity(
         id = id,
         title = title,
@@ -114,7 +114,7 @@ fun SavedToPostTodoEntity.toTodo() : Todo{
     )
 }
 
-fun Todo.toSavedToPostTodoEntity() : SavedToPostTodoEntity{
+fun Todo.toSavedToPostTodoEntity() : SavedToPostTodoEntity {
     return SavedToPostTodoEntity(
         id = id,
         title = title,

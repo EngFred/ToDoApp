@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.engineerfred.kotlin.todoapp"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -127,6 +127,11 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+
+    //dataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    implementation("androidx.wear.compose:compose-material:1.3.0")
 }
 
 kapt {

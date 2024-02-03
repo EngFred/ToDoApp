@@ -1,9 +1,10 @@
-package com.engineerfred.kotlin.todoapp.feature_todo.data.local
+package com.engineerfred.kotlin.todoapp.feature_todo.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.SavedToPostTodoEntity
 
 @Dao
 interface SavedToPostTodoDao {
@@ -14,9 +15,9 @@ interface SavedToPostTodoDao {
     suspend fun getTodoById( id: Long ) : SavedToPostTodoEntity?
 
     @Upsert
-    suspend fun addTodo( todo: SavedToPostTodoEntity )
+    suspend fun addTodo( todo: SavedToPostTodoEntity)
 
     @Delete
-    suspend fun deleteTodo( todo: SavedToPostTodoEntity )
+    suspend fun deleteTodo( todo: SavedToPostTodoEntity)
 
 }

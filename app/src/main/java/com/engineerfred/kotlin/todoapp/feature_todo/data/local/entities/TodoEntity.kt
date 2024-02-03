@@ -1,4 +1,4 @@
-package com.engineerfred.kotlin.todoapp.feature_todo.data.local
+package com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

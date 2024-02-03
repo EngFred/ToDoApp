@@ -8,6 +8,7 @@ sealed class TodosListEvents {
     data class TodosSortClicked( val todosOrder: TodosOrder ) : TodosListEvents()
     data class TodoCompletedClicked( val todo: Todo ) : TodosListEvents()
     data class TodoArchived( val todo: Todo ) : TodosListEvents()
+    data object OnThemeChanged: TodosListEvents()
 }
 
 sealed class TodosSortingDirection {

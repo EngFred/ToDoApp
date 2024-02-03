@@ -14,7 +14,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.engineerfred.kotlin.todoapp.R
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toTodoDto
 import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TasksService
 import dagger.assisted.Assisted

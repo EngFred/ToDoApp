@@ -3,8 +3,8 @@ package com.engineerfred.kotlin.todoapp.feature_todo.data.repository
 import android.util.Log
 import com.engineerfred.kotlin.todoapp.core.util.Resource
 import com.engineerfred.kotlin.todoapp.feature_todo.data.di.IoDispatcher
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.TodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toDeletedTodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toSaveToPostTodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.data.mappers.toSavedToPostTodoEntity
@@ -61,7 +61,7 @@ class TasksRepositoryImpl @Inject constructor (
 
     private suspend fun FlowCollector<Resource<List<Todo>>>.getTodosFromService() {
         try {
-            val remoteTodos = service.getAllRemoteTodos().filterNotNull()
+            val remoteTodos = service.getAllRemoteTodos().values.toList().filterNotNull()
             cache.todoDao.addAllRemoteTodos(remoteTodos.map { it.toTodoEntity() })
             cache.todoDao.getAllTodos().collect {
                 emit(Resource.Success(it.map { it.toTodo() }))
@@ -86,7 +86,7 @@ class TasksRepositoryImpl @Inject constructor (
         }
     }
 
-    override fun addTodo( todoEntity: TodoEntity ): Flow<Resource<Unit?>> {
+    override fun addTodo( todoEntity: TodoEntity): Flow<Resource<Unit?>> {
         var newTaskId: Long = 0L
         return flow {
             emit(Resource.Loading)
@@ -164,37 +164,4 @@ class TasksRepositoryImpl @Inject constructor (
         }
     }
 
-    override fun getAllTodosThatWereCreateWhileOffline(): Flow<Resource<List<Todo>>> {
-        return flow {
-            emit(Resource.Loading)
-            val tasks = cache.savedToPostTodoDao.getAllTodos()
-            if ( tasks.isEmpty() ) {
-                Log.d("OfflineAction", "No task was added while offline!")
-                emit(Resource.Undefined)
-            } else {
-                emit(Resource.Success( tasks.map { it.toTodo() } ))
-                Log.d("OfflineAction", "Task added while offline: ${tasks.size} ")
-            }
-        }.flowOn(ioDispatcher).catch {
-            Log.i("OfflineAction", "Getting Tasks that were added while offline: $it")
-            emit(Resource.Failure("$it"))
-        }
-    }
-
-    override fun getAllTodosThatWereDeletedWhileOffline(): Flow<Resource<List<Todo>>> {
-        return flow {
-            emit(Resource.Loading)
-            val tasks = cache.deletedTodoDao.getAllDeletedTodos()
-            if ( tasks.isEmpty() ) {
-                Log.d("OfflineAction", "No task was deleted while offline!")
-                emit(Resource.Undefined)
-            } else {
-                Log.d("OfflineAction", "Task deleted while offline: ${tasks.size} ")
-                emit(Resource.Success( tasks.map { it.toTodo() } ))
-            }
-        }.flowOn(ioDispatcher).catch {
-            Log.i("OfflineAction", "Getting Tasks that were deleted while offline: $it")
-            emit(Resource.Failure("$it"))
-        }
-    }
 }

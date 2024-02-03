@@ -1,7 +1,7 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.data.di
 
 import com.engineerfred.kotlin.todoapp.core.util.Constants.BASE_URL
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TasksDatabase
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.remote.TasksService
 import com.engineerfred.kotlin.todoapp.feature_todo.data.repository.TasksRepositoryImpl
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.repository.TasksRepository
@@ -40,7 +40,11 @@ object RemoteModule {
 
     @Provides
     @Singleton
-    fun provideTodosRepository(service: TasksService, cache: TasksDatabase, @IoDispatcher ioDispatcher: CoroutineDispatcher ) : TasksRepository {
+    fun provideTodosRepository(
+        service: TasksService,
+        cache: TasksDatabase,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher
+    ) : TasksRepository {
         return  TasksRepositoryImpl(  service, cache, ioDispatcher )
     }
 

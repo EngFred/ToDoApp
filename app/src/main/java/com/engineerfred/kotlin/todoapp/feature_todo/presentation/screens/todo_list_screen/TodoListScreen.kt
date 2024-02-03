@@ -2,7 +2,6 @@ package com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_l
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -63,22 +62,13 @@ fun TodosListScreen(
     val todosListViewModel = hiltViewModel<TodosListViewModel>()
     val context = LocalContext.current
 
+    val bgColor =  if ( todosListViewModel.uiState.isLightTheme )  {
+        Color(0xFF0061A4)
+    } else {
+        Color(0xFF1A1C1E)
+    }
+
     val todosState = todosListViewModel.todosState.collectAsState().value
-
-//    when( todoUpdatingState ) {
-//        is Resource.Failure -> {
-//            if ( !todoUpdatingState.errorMessage.contains("ConnectException") ) {
-//                LaunchedEffect( true ) {
-//                    Toast.makeText(context, "Failed to update todo!", Toast.LENGTH_LONG).show()
-//                }
-//            }
-//        }
-//        else -> Unit
-//    }
-
-//    val isUpdating by rememberSaveable {
-//        mutableStateOf( (todoUpdatingState is Resource.Loading) || (todoDeletingState is Resource.Loading) )
-//    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -88,9 +78,7 @@ fun TodosListScreen(
     val screenBackgroundImage = if ( isPortrait ) painterResource(id = R.drawable.background_portrait) else painterResource(id = R.drawable.background_landscape)
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+        modifier = Modifier.fillMaxSize()
     ) {
         when( todosState ) {
             Resource.Loading -> {
@@ -133,7 +121,11 @@ fun TodosListScreen(
                                 onOrderChange = {
                                     todosListViewModel.onEvent( TodosListEvents.TodosSortClicked(it) )
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                isLightTheme = todosListViewModel.uiState.isLightTheme,
+                                onThemeChange = {
+                                    todosListViewModel.onEvent( TodosListEvents.OnThemeChanged )
+                                }
                             )
                             Text(
                                 text = "Developed by Engineer Fred @2024",
@@ -153,45 +145,43 @@ fun TodosListScreen(
                             FloatingActionButton(
                                 onClick = { onCreateTask.invoke() },
                                 shape = CircleShape,
-                                containerColor = MaterialTheme.colorScheme.primary
+                                containerColor = bgColor
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_add),
                                     contentDescription = stringResource(id = R.string.add_todo_icon),
-                                    tint = MaterialTheme.colorScheme.onPrimary
+                                    tint = Color(0xFFE2E2E6)
                                 )
                             }
                         },
                         topBar = {
-                            CenterAlignedTopAppBar(
+                            TopAppBar(
                                 title = {
                                     Box{
                                         Text(
                                             text = "Tasks",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 22.sp,
-                                            color = MaterialTheme.colorScheme.onPrimary,
                                             modifier = Modifier
                                                 .padding(end = 20.dp)
-                                                .align(Alignment.CenterStart)
+                                                .align(Alignment.CenterStart),
+                                            color = Color(0xFFE2E2E6)
                                         )
                                         Text(
                                             text = "${todos.size}",
                                             fontSize = 12.sp,
-                                            modifier = Modifier.align(
-                                            Alignment.TopEnd)
+                                            modifier = Modifier.align(Alignment.TopEnd),
+                                            color = Color(0xFFE2E2E6)
                                         )
                                     }
                                 },
                                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .7f),
-                                    scrolledContainerColor = MaterialTheme.colorScheme.primary,
-                                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                    containerColor = bgColor,
+                                    navigationIconContentColor = Color(0xFFE2E2E6),
+                                    titleContentColor = Color(0xFFE2E2E6),
+                                    actionIconContentColor = Color(0xFFE2E2E6)
                                 ),
-                                navigationIcon = {},
-                                actions = {
+                                navigationIcon = {
                                     IconButton(onClick = {
                                         scope.launch {
                                             drawerState.open()
@@ -208,6 +198,16 @@ fun TodosListScreen(
                                                 contentDescription =  stringResource(id = R.string.close_drawer_menu_icon)
                                             )
                                         }
+                                    }
+                                },
+                                actions = {
+                                    IconButton(onClick = {
+                                        //todo("Search a task")
+                                    }) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.baseline_search_24),
+                                            contentDescription =  stringResource(id = R.string.search_icon)
+                                        )
                                     }
                                 }
                             )
@@ -243,7 +243,7 @@ fun TodosListScreen(
                                     todosListViewModel.onEvent( TodosListEvents.DeleteTodoClicked(it) )
                                 }, onCardClicked = {
                                     onUpdateTask.invoke(it)
-                                }
+                                }, isDarkTheme = todosListViewModel.uiState.isLightTheme
                             )
                         }
                     }
@@ -267,7 +267,10 @@ fun TodosListScreen(
                         color = MaterialTheme.colorScheme.error
                     )
                     Row(
-                        modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(26.dp),
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .padding(26.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {

@@ -1,13 +1,26 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.components
 
+import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.engineerfred.kotlin.todoapp.R
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosOrder
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosSortingDirection
 
@@ -15,8 +28,11 @@ import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.tod
 fun MenuDrawerContent(
     modifier: Modifier = Modifier,
     todosOrder: TodosOrder, //will be obtain from the uiState
-    onOrderChange: (TodosOrder) -> Unit
+    onOrderChange: (TodosOrder) -> Unit,
+    isLightTheme: Boolean,
+    onThemeChange: () -> Unit
 ) {
+
     Column(
         modifier = modifier
     ) {
@@ -90,5 +106,36 @@ fun MenuDrawerContent(
                 onOrderChange.invoke( todosOrder.update( todosOrder.sortingDirection, !todosOrder.showAchieved ) )
             }
         )
+
+        Spacer(modifier = Modifier.height(7.dp))
+        Divider()
+
+        Row(
+            modifier  = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 0.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Switch(
+                checked = !isLightTheme, //whenever our boolean value from the state is false
+                onCheckedChange = {
+                    Log.v("SwitchBoolean", "$it")
+                    onThemeChange.invoke()
+                }
+            )
+            Text(
+                text = if (isLightTheme) "Light Theme" else "Dark Theme", //whenever our boolean value from the state is false
+                modifier = modifier.padding(start = 6.dp).weight(1f),
+                fontSize = 14.sp
+            )
+            Icon(
+                painter = if (isLightTheme) painterResource(id = R.drawable.ic_light_mode) else painterResource(id = R.drawable.ic__dark_mode_24),
+                contentDescription = stringResource(id = R.string.theme_icon)
+            )
+        }
+        
+        Spacer(modifier = Modifier.weight(1f))
+
     }
 }

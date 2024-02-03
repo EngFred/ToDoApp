@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.NetworkType
@@ -21,6 +22,7 @@ import com.engineerfred.kotlin.todoapp.feature_todo.data.worker.TasksWorker
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.navigation.AppNavigationGraph
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme.ToDoAppTheme
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModelAssistedFactory
+import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosListViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -41,8 +43,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ToDoAppTheme {
+            val todosListViewModel = hiltViewModel<TodosListViewModel>()
 
+            ToDoAppTheme( useDarkTheme = todosListViewModel.uiState.isLightTheme ) {
                 val notificationPermissionRequest = rememberPermissionState(
                     permission = android.Manifest.permission.POST_NOTIFICATIONS
                 )

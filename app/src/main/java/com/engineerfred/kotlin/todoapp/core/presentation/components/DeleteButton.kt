@@ -3,7 +3,6 @@ package com.engineerfred.kotlin.todoapp.core.presentation.components
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -15,7 +14,7 @@ import com.engineerfred.kotlin.todoapp.R
 @Composable
 fun DeleteButton(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.error,
+    color: Color = Color(0xFF690005),
     onDeleteClicked: () -> Unit,
 ) {
     //TODO("On Deleting todos should move to the trash for 30 days")

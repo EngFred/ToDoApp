@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.engineerfred.kotlin.todoapp.core.util.Resource
-import com.engineerfred.kotlin.todoapp.feature_todo.data.local.TodoEntity
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.TodoEntity
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.models.Todo
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.AddTodoUseCase
 import com.engineerfred.kotlin.todoapp.feature_todo.domain.use_cases.DeleteTodoUseCase

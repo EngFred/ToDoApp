@@ -19,7 +19,8 @@ fun TodosList(
     onAchieved: (Todo) -> Unit,
     onCompleted: (Todo) -> Unit,
     onDeleted: (Todo) -> Unit,
-    onCardClicked: (todoId: Long) -> Unit
+    onCardClicked: (todoId: Long) -> Unit,
+    isDarkTheme: Boolean
 ) {
 
     val filterTodos = setTodosSortOrder(todosListViewModel, todos)
@@ -48,7 +49,8 @@ fun TodosList(
                 },
                 onAchieveClicked = { onAchieved.invoke(todo) },
                 onCardClicked = { onCardClicked.invoke(todo.id) },
-                onCompletedClicked = { onCompleted.invoke(todo) }
+                onCompletedClicked = { onCompleted.invoke(todo) },
+                isDarkTheme = isDarkTheme
             )
         }
     }

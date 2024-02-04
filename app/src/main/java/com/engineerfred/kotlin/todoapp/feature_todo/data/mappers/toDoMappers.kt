@@ -13,8 +13,9 @@ fun Todo.toTodoDto() : TodoDto {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -25,8 +26,9 @@ fun Todo.toTodoEntity() : TodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -37,8 +39,9 @@ fun Todo.toDeletedTodoEntity() : DeletedTodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -49,8 +52,9 @@ fun TodoEntity.toTodo() : Todo{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -61,8 +65,9 @@ fun TodoEntity.toSaveToPostTodoEntity() : SavedToPostTodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -73,7 +78,8 @@ fun TodoDto.toTodo() : Todo{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived
+        prioritized = prioritized,
+        dueDate = dueDate
     )
 }
 
@@ -85,8 +91,9 @@ fun TodoEntity.toTodoDtO() : TodoDto{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -97,8 +104,9 @@ fun TodoDto.toTodoEntity() : TodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -109,8 +117,9 @@ fun SavedToPostTodoEntity.toTodo() : Todo{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -121,8 +130,9 @@ fun Todo.toSavedToPostTodoEntity() : SavedToPostTodoEntity {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -133,8 +143,9 @@ fun DeletedTodoEntity.toTodo() : Todo {
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -145,8 +156,9 @@ fun SavedToPostTodoEntity.toTodoDto() : TodoDto{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 
@@ -157,8 +169,9 @@ fun TodoEntity.toTodoDto() : TodoDto{
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = archived,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }
 

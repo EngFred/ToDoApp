@@ -8,12 +8,14 @@ data class SaveUpdateTodoScreenState(
     val todoTitle: String = "",
     val description: String = "",
     val timeStamp: Long = 0L,
-    val achieved: Boolean = false,
+    val prioritized: Boolean = false,
     val completed: Boolean = false,
     val isSynced: Boolean = false,
+    val dueDate: Long? = null,
 
     val titleErrorMessage: String = "",
     val descriptionErrorMessage: String = "",
+    val invalidDateMessage: String = "",
 ) {
     //for create a todo based on the state values
     val todo = Todo(
@@ -22,7 +24,8 @@ data class SaveUpdateTodoScreenState(
         description = description,
         timeStamp = timeStamp,
         completed = completed,
-        archived = achieved,
-        isSynced = isSynced
+        prioritized = prioritized,
+        isSynced = isSynced,
+        dueDate = dueDate
     )
 }

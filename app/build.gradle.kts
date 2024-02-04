@@ -26,7 +26,24 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+//            isMinifyEnabled = false
+//            proguardFiles(
+//                getDefaultProguardFile("proguard-android-optimize.txt"),
+//                "proguard-rules.pro"
+//            )
+
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type. Make sure to use a build
+            // variant with `isDebuggable=false`.
+            isMinifyEnabled = true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            isShrinkResources = true
+
+            // Includes the default ProGuard rules files that are packaged with
+            // the Android Gradle plugin. To learn more, go to the section about
+            // R8 configuration files.
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -60,7 +77,7 @@ dependencies {
     val hiltComposeNavigationVersion = "1.1.0"
     val coroutinesVersion = "1.7.3"
     val roomVersion = "2.6.1"
-    val workerVersion = "2.9.0"
+    val workerVersion = "2.8.1"
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

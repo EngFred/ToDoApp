@@ -14,11 +14,14 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.engineerfred.kotlin.todoapp.feature_todo.data.worker.TasksWorker
+import com.engineerfred.kotlin.todoapp.feature_todo.data.worker.ReminderWorker
+import com.engineerfred.kotlin.todoapp.feature_todo.data.worker.TasksSyncWorker
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.navigation.AppNavigationGraph
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.theme.ToDoAppTheme
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModelAssistedFactory
@@ -50,23 +53,50 @@ class MainActivity : ComponentActivity() {
                     permission = android.Manifest.permission.POST_NOTIFICATIONS
                 )
 
-                val workerConstraints = Constraints.Builder()
+                val taskSyncConstraints = Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+                val taskReminderConstraints = Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.NOT_REQUIRED).build()
 
                 LaunchedEffect(Unit) {
                     if ( notificationPermissionRequest.status.isGranted ) {
-                        val workRequest = OneTimeWorkRequestBuilder<TasksWorker>()
+
+                        val workRequest = OneTimeWorkRequestBuilder<TasksSyncWorker>()
                             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                             .setBackoffCriteria(
-                                backoffPolicy = BackoffPolicy.EXPONENTIAL, //triggered whenever we return a retry from our worker
-                                duration = Duration.ofSeconds(15)
-                            ).setConstraints(workerConstraints).build()
+                                BackoffPolicy.EXPONENTIAL,
+                                Duration.ofSeconds(15)
+                            ).setConstraints(taskSyncConstraints).build()
                         WorkManager.getInstance(applicationContext).enqueue(workRequest)
+
+//                        val tasksSyncRequest = PeriodicWorkRequestBuilder<TasksSyncWorker>(
+//                            repeatInterval = Duration.ofHours(8),
+//                            flexTimeInterval = Duration.ofHours(4)
+//                        ).setConstraints(taskSyncConstraints).build()
+//                        WorkManager.getInstance(applicationContext)
+//                            .enqueueUniquePeriodicWork(
+//                                "tasks_sync_work",
+//                                ExistingPeriodicWorkPolicy.KEEP,
+//                                tasksSyncRequest
+//                            )
+
+
+                        val reminderWorkRequest = PeriodicWorkRequestBuilder<ReminderWorker>(
+                            repeatInterval = Duration.ofHours(23),
+                            flexTimeInterval = Duration.ofHours(12)
+                        ).setConstraints(taskReminderConstraints).build()
+                        WorkManager.getInstance(applicationContext)
+                            .enqueueUniquePeriodicWork(
+                                "reminder_notification_work",
+                                ExistingPeriodicWorkPolicy.KEEP,
+                                reminderWorkRequest
+                            )
+
                     } else {
                         notificationPermissionRequest.launchPermissionRequest()
                     }
                 }
-
                 TodoApplication(saveUpdateTodoViewModelAssistedFactory)
             }
         }
@@ -81,10 +111,3 @@ private fun TodoApplication(
         AppNavigationGraph(saveUpdateTodoViewModelAssistedFactory = saveUpdateTodoViewModelAssistedFactory)
     }
 }
-
-
-
-//        val workRequest = PeriodicWorkRequestBuilder<TasksWorker>(
-//            repeatInterval = Duration.ofHours(1), // Adjust the interval as needed
-//            flexTimeInterval = Duration.ofMinutes(15) // Optional flex time
-//        ).build()

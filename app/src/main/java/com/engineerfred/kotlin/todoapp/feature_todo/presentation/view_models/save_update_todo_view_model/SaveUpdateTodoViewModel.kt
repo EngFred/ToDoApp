@@ -35,7 +35,7 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
         private set
 
     companion object {
-        const val TAG = "TodoApplication"
+        const val TAG = "SaveUpdateTaskViewModel"
     }
 
     init {
@@ -46,8 +46,8 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
     fun onEvent( event: SaveUpdateTodoScreenEvents ) {
         when( event ) {
             SaveUpdateTodoScreenEvents.AchieveClicked -> {
-                uiState = uiState.copy( achieved = !uiState.achieved )
-                Log.v(TAG, "Archived: ${uiState.achieved}")
+                uiState = uiState.copy( prioritized = !uiState.prioritized )
+                Log.v(TAG, "Archived: ${uiState.prioritized}")
             }
             SaveUpdateTodoScreenEvents.CompletedClicked -> {
                 uiState = uiState.copy( completed = !uiState.completed )
@@ -79,10 +79,18 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
                     else -> uiState.copy(titleErrorMessage = "")
                 }
             }
+
+            is SaveUpdateTodoScreenEvents.DueDateSelected -> {
+                if ( event.date < System.currentTimeMillis() )
+                    uiState = uiState.copy( invalidDateMessage = "Selected date is invalid" )
+                else
+                    uiState = uiState.copy( dueDate = event.date, invalidDateMessage = "" )
+            }
         }
     }
 
     private fun saveTodo() {
+
         viewModelScope.launch{
 
             val todoEntity = TodoEntity(
@@ -90,8 +98,9 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
                 description = uiState.description,
                 timeStamp = System.currentTimeMillis(),
                 completed = uiState.completed,
-                archived = uiState.achieved,
-                isSynced = uiState.isSynced
+                prioritized = uiState.prioritized,
+                isSynced = uiState.isSynced,
+                dueDate = uiState.dueDate
             )
 
             addTodoUseCase.invoke(todoEntity).collect{
@@ -108,7 +117,8 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
                 uiState.todo.title == todo.value?.title &&
                         uiState.todo.description == todo.value?.description &&
                         uiState.todo.completed == todo.value?.completed &&
-                        uiState.todo.archived == todo.value?.archived
+                        uiState.todo.prioritized == todo.value?.prioritized &&
+                        uiState.todo.dueDate == todo.value?.dueDate
                 ) //the user hasn't changed anything!
 
         if (noChangesWereMade) {
@@ -117,27 +127,30 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
         } else {
             Log.v(TAG, "The user changed some fields of the task!")
             viewModelScope.launch {
-                updateTodoUseCase.invoke( uiState.todo ).collect{
-                    saveUpdateCompleted = when (it) {
-                        is Resource.Success -> true
-                        else -> false
-                    }
-                }
+                updateTodoUseCase.invoke( uiState.todo )
+                saveUpdateCompleted = true
             }
         }
     }
 
     private fun isDataValid() : Boolean {
-        return when {
+        when {
             ( uiState.todo.title.isEmpty() || uiState.todo.title.length < 3 ) -> {
                 Log.v(TAG, "The task title is invalid!")
-                false
+                return false
+            }
+            ( uiState.dueDate != null ) -> {
+                if ( uiState.dueDate!! < System.currentTimeMillis() ) {
+                    Log.v(TAG, "The selected date is invalid")
+                    return false
+                }
+                return true
             }
             ( uiState.todo.description.isEmpty() || uiState.todo.description.length < 6 ) -> {
                 Log.v(TAG, "The task description is invalid!")
-                false
+                return false
             }
-            else -> true
+            else -> return true
         }
     }
 
@@ -145,12 +158,8 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
         if ( todoId != -1L ) {
             viewModelScope.launch{
                 todo.value?.let {
-                    deleteTodoUseCase.invoke(it).collect{
-                        saveUpdateCompleted = when (it) {
-                            is Resource.Success -> true
-                            else -> false
-                        }
-                    }
+                    deleteTodoUseCase.invoke(it)
+                    saveUpdateCompleted = true
                 }
             }
         }
@@ -169,9 +178,10 @@ class SaveUpdateTodoViewModel @AssistedInject constructor(
                                 todoTitle = retrievedTodo.title,
                                 description = retrievedTodo.description,
                                 timeStamp = retrievedTodo.timeStamp,
-                                achieved = retrievedTodo.archived,
+                                prioritized = retrievedTodo.prioritized,
                                 isSynced = retrievedTodo.isSynced,
                                 completed = retrievedTodo.completed,
+                                dueDate = retrievedTodo.dueDate
                             )
                         }
                     }

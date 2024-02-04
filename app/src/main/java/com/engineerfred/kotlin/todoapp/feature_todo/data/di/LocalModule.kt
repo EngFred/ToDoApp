@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
+import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.MIGRATION_2_1
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase.Companion.DATABASE_NAME
 import com.engineerfred.kotlin.todoapp.feature_todo.data.repository.PreferencesRepositoryImpl
@@ -29,7 +30,7 @@ object LocalModule {
             context,
             TasksDatabase::class.java,
             DATABASE_NAME
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(MIGRATION_2_1).fallbackToDestructiveMigration().build()
 
     @Singleton
     @Provides

@@ -14,8 +14,14 @@ interface TodoDao {
     @Query("SELECT * FROM todo")
     fun getAllTodos() : Flow<List<TodoEntity>>
 
+    @Query("SELECT * FROM todo WHERE dueDate IS NOT NULL")
+    suspend fun getAllScheduledTodos() : List<TodoEntity>
+
     @Query("SELECT * FROM todo WHERE isSynced = 0")
     suspend fun getUnsyncedTodos() : List<TodoEntity>
+
+    @Query("SELECT * FROM todo WHERE LOWER(title) LIKE '%' || :query || '%'")
+    fun searchTasks(query: String): Flow<List<TodoEntity>>
 
     @Query("SELECT * FROM toDo WHERE id = :id")
     fun getTodoById(id: Long ) : Flow<TodoEntity?>

@@ -1,6 +1,8 @@
 package com.engineerfred.kotlin.todoapp.feature_todo.data.repository
 
 import android.util.Log
+import com.engineerfred.kotlin.todoapp.core.util.Constants.EMPTY_SERVER_RESPONSE_EXCEPTION
+import com.engineerfred.kotlin.todoapp.core.util.Constants.NO_INTERNET_EXCEPTION
 import com.engineerfred.kotlin.todoapp.core.util.Resource
 import com.engineerfred.kotlin.todoapp.feature_todo.data.di.IoDispatcher
 import com.engineerfred.kotlin.todoapp.feature_todo.data.local.cache.TasksDatabase
@@ -61,16 +63,22 @@ class TasksRepositoryImpl @Inject constructor (
 
     private suspend fun FlowCollector<Resource<List<Todo>>>.getTodosFromService() {
         try {
-            val remoteTodos = service.getAllRemoteTodos().values.toList().filterNotNull()
+            val remoteTodos = service.getAllRemoteTodos().filterNotNull()
             cache.todoDao.addAllRemoteTodos(remoteTodos.map { it.toTodoEntity() })
             cache.todoDao.getAllTodos().collect {
                 emit(Resource.Success(it.map { it.toTodo() }))
                 Log.i(TAG, "Got todos from service, cached them & retrieved them.")
             }
         } catch (ex: Exception) {
-            if ( ex is CancellationException ) throw ex
-            Log.i(TAG, "Failed to get todos from the service + there's now any todos data from local cache")
-            emit( Resource.Failure("$ex") )
+            when (ex) {
+                is CancellationException -> throw ex
+                is UnknownHostException, is ConnectException, is HttpException -> { emit( Resource.Failure(NO_INTERNET_EXCEPTION) ) }
+                is NullPointerException -> { emit( Resource.Failure(EMPTY_SERVER_RESPONSE_EXCEPTION) ) }
+                else -> {
+                    Log.i(TAG, "Failed to get todos from the service + there's now any todos data from local cache")
+                    emit( Resource.Failure("$ex") )
+                }
+            }
         }
     }
 
@@ -118,50 +126,53 @@ class TasksRepositoryImpl @Inject constructor (
         }
     }
 
-    override fun updateTodo( todo: Todo ) : Flow<Resource<Unit?>> {
-        return flow{
-            emit(Resource.Loading)
+    override suspend fun updateTodo( todo: Todo ) {
+        try {
             cache.todoDao.addUpdateTodo( todo.toTodoEntity().copy( isSynced = false ) )
             Log.i(TAG, "Todo updated in cache! Syncing in progress...")
-            emit(Resource.Success(null))
             withContext(NonCancellable) {
                 service.updateTodo( todo.id, todo.toTodoDto().copy( isSynced = true ) )
                 Log.i(TAG, "Todo has been synced successfully! Updating cache..." )
                 cache.todoDao.addUpdateTodo( todo.toTodoEntity().copy( isSynced = true ) )
                 Log.v(TAG, "Todo has been updated successfully!" )
             }
-            emit(Resource.Undefined)
-        }.flowOn(ioDispatcher).catch{
-            if ( it is CancellationException ) throw it
-            Log.i(TAG, "Updating todo: $it")
-            emit(Resource.Failure("$it"))
+        } catch ( ex: Exception ) {
+            if ( ex is CancellationException ) throw ex
+            Log.i(TAG, "Updating todo: $ex")
         }
     }
 
-    override fun deleteTodo( todo: Todo ) : Flow<Resource<Unit>> {
-        return flow {
-            emit(Resource.Loading)
+    override suspend fun deleteTodo( todo: Todo ) {
+        try {
             cache.savedToPostTodoDao.deleteTodo(todo.toSavedToPostTodoEntity())
-            val todoResult = cache.todoDao.deleteTodo(todo.toTodoEntity())
-            emit(Resource.Success(todoResult))
+            cache.todoDao.deleteTodo(todo.toTodoEntity())
             Log.i(TAG, "Deleting todo from service...")
             withContext(NonCancellable) {
                 service.deleteTodo( todo.id )
                 Log.v(TAG, "Todo has been deleted successfully from service too!")
             }
-            emit(Resource.Undefined)
-        }.flowOn(ioDispatcher).catch{
-            if ( it is CancellationException ) throw  it
-            if ( it is ConnectException || it is HttpException || it is UnknownHostException ) {
-               withContext(NonCancellable) {
-                   Log.i(TAG, "Todo is deleted from cache but not from service! it's currently Stored in the trash for later deletion from the service as well.")
-                   cache.deletedTodoDao.addDeletedTodo(todo.toDeletedTodoEntity())
-                   Log.v(TAG, "Todo has been stored in the trash successfully for later deletion from the service!")
-               }
+        } catch ( ex: Exception ) {
+            if ( ex is CancellationException ) throw  ex
+            if ( ex is ConnectException || ex is HttpException || ex is UnknownHostException ) {
+                withContext(NonCancellable) {
+                    Log.i(TAG, "Todo is deleted from cache but not from service! it's currently Stored in the trash for later deletion from the service as well.")
+                    cache.deletedTodoDao.addDeletedTodo(todo.toDeletedTodoEntity())
+                    Log.v(TAG, "Todo has been stored in the trash successfully for later deletion from the service!")
+                }
             }
-            Log.i(TAG, "Deleting todo: $it")
-            emit(Resource.Failure("Failed to delete todo!"))
+            Log.i(TAG, "Deleting todo: $ex")
         }
     }
 
+    override fun searchTasks(query: String): Flow<List<Todo>> {
+        return flow {
+            cache.todoDao.searchTasks(query).collect{
+                emit(it.map { it.toTodo() })
+            }
+        }.catch {
+            if ( it is CancellationException ) throw it
+            Log.i(TAG, "Updating todo: $it")
+            emit(emptyList())
+        }.flowOn( ioDispatcher )
+    }
 }

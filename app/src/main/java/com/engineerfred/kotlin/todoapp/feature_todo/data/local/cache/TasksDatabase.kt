@@ -15,7 +15,7 @@ import com.engineerfred.kotlin.todoapp.feature_todo.data.local.entities.TodoEnti
         DeletedTodoEntity::class,
         SavedToPostTodoEntity::class
                 ],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 abstract class TasksDatabase : RoomDatabase() {

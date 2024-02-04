@@ -14,6 +14,8 @@
     <string name="screen_background_image">screen_background_image</string>
     <string name="logo_image_icon">logo_image_icon</string>
     <string name="back_icon">back_icon</string>
+    <string name="close_icon">close_icon</string>
     <string name="error_icon">error_icon</string>
     <string name="theme_icon">theme_icon</string>
+    <string name="schedule_icon">schedule_icon</string>
 </resources>

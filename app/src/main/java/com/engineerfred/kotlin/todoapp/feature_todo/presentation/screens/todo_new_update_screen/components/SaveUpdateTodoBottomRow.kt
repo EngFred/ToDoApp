@@ -51,7 +51,7 @@ fun SaveUpdateTodoBottomRow(
         )
         AchieveButton(
             onAchieveClicked = onAchieved,
-            achieved = todo.archived,
+            achieved = todo.prioritized,
             color = todoColors.achieveIconColor
         )
         DeleteButton( onDeleteClicked = onDeleted )
@@ -81,7 +81,8 @@ fun BottomRowPreview() {
                 description = "bla bla bla blah bla bla bla bla blah bla bla bla bla blah bla bla bla bla blah bla",
                 timeStamp = 0L,
                 completed = true,
-                archived = true
+                prioritized = true,
+                dueDate = null
             ),
             onCompleted = { /*TODO*/ },
             onAchieved = { /*TODO*/ },

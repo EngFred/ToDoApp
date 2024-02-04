@@ -42,12 +42,6 @@ class TodosListViewModel @Inject constructor(
     private val _todosState = MutableStateFlow<Resource<List<Todo>>>(Resource.Loading)
     val todosState = _todosState.asStateFlow()
 
-    private val _todoDeleteState = MutableStateFlow<Resource<Unit>>(Resource.Undefined)
-    val todoDeleteState = _todoDeleteState.asStateFlow()
-
-    private val _todoUpdateState = MutableStateFlow<Resource<Unit?>>(Resource.Undefined)
-    val todoUpdateState = _todoUpdateState.asStateFlow()
-
     var uiState by mutableStateOf(TodosListScreenState())
         private set
 
@@ -63,17 +57,13 @@ class TodosListViewModel @Inject constructor(
         when( event ) {
             is TodosListEvents.DeleteTodoClicked -> {
                 undoTodoDelete = event.todo
-                viewModelScope.launch {
-                    deleteTodoUseCase.invoke( event.todo ).collect{
-                        _todoDeleteState.value = it
-                    }
+                viewModelScope.launch( ioDispatcher ) {
+                    deleteTodoUseCase.invoke( event.todo )
                 }
             }
             is TodosListEvents.TodoCompletedClicked -> {
-                viewModelScope.launch{
-                    updateTodoUseCase.invoke(event.todo.copy( completed = !event.todo.completed )).collect{
-                        _todoUpdateState.value = it
-                    }
+                viewModelScope.launch ( ioDispatcher ){
+                    updateTodoUseCase.invoke(event.todo.copy( completed = !event.todo.completed ))
                 }
             }
             is TodosListEvents.TodosSortClicked -> {
@@ -87,17 +77,18 @@ class TodosListViewModel @Inject constructor(
                     undoTodoDelete = null
                 }
             }
-            is TodosListEvents.TodoArchived -> {
-                _todoUpdateState.value = Resource.Loading
-                viewModelScope.launch {
-                    updateTodoUseCase.invoke(event.todo.copy( archived = !event.todo.archived )).collect{
-                        _todoUpdateState.value = it
-                    }
+            is TodosListEvents.TodoPrioritized -> {
+                viewModelScope.launch( ioDispatcher ) {
+                    updateTodoUseCase.invoke(event.todo.copy( prioritized = !event.todo.prioritized ))
                 }
             }
             is TodosListEvents.OnThemeChanged -> {
                 uiState = uiState.copy( isLightTheme =  !uiState.isLightTheme )
                 changeAppTheme()
+            }
+
+            TodosListEvents.RetryClicked -> {
+                initialize()
             }
         }
     }
@@ -118,7 +109,7 @@ class TodosListViewModel @Inject constructor(
                         when (it.sortingType) {
                             "time" -> {
                                 tasksOrder = when {
-                                    tasksOrder.showAchieved -> {
+                                    tasksOrder.showPrioritized -> {
                                         TodosOrder.Time( TodosSortingDirection.AtoZ, true )
                                     } else -> TodosOrder.Time( TodosSortingDirection.AtoZ, false)
                                 }
@@ -205,19 +196,10 @@ class TodosListViewModel @Inject constructor(
                 TodosSortingDirection.AtoZ -> "a_z"
                 TodosSortingDirection.ZtoA -> "z_a"
             },
-            showAchieved = todosOrder.showAchieved
+            showAchieved = todosOrder.showPrioritized
         )
         viewModelScope.launch {
             changeTasksOrderUseCase.invoke(tasksOrderPreferences)
         }
     }
 }
-
-
-
-//                val stateOrderAlreadyMatchesEventOrder = uiState.todosOrder::class == event.todosOrder::class &&
-//                        uiState.todosOrder.showAchieved == event.todosOrder.showAchieved &&
-//                        uiState.todosOrder.sortingDirection == event.todosOrder.sortingDirection
-//                if( stateOrderAlreadyMatchesEventOrder ) return else {
-//                    uiState = uiState.copy( todosOrder = event.todosOrder  )
-//                }

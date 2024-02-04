@@ -6,6 +6,7 @@ data class TodoDto(
     val description: String,
     val timeStamp: Long,
     val completed: Boolean,
-    val archived: Boolean,
+    val prioritized: Boolean,
     val isSynced: Boolean,
+    val dueDate: Long?
 )

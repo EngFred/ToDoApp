@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.search_screen.SearchScreen
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.TodosListScreen
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_new_update_screen.SaveUpdateTodoScreen
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.save_update_todo_view_model.SaveUpdateTodoViewModelAssistedFactory
@@ -34,6 +35,11 @@ fun AppNavigationGraph(
                         popUpTo(Route.TodosSaveUpdateScreen.destination)
                         launchSingleTop = true
                     }
+                }, onSearchClicked = {
+                    navHostController.navigate( Route.SearchScreen.destination ) {
+                        popUpTo( Route.SearchScreen.destination )
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -52,6 +58,20 @@ fun AppNavigationGraph(
                 saveUpdateTodoViewModelAssistedFactory = saveUpdateTodoViewModelAssistedFactory,
                 onBackClicked = { navHostController.navigateUp() },
                 todoId = todoId
+            )
+        }
+
+        composable(
+            route = Route.SearchScreen.destination
+        ) {
+            SearchScreen(
+                onBackClicked = {navHostController.navigateUp()},
+                onUpdateTask = {
+                    navHostController.navigate( "${Route.TodosSaveUpdateScreen.destination }?todoId=$it") {
+                        popUpTo(Route.TodosSaveUpdateScreen.destination)
+                        launchSingleTop = true
+                    }
+                }
             )
         }
         

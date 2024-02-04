@@ -14,18 +14,17 @@ fun setTodosSortOrder(
             when (todosListViewModel.uiState.todosOrder) {
                 is TodosOrder.Title -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedByDescending { it.title.lowercase() }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedByDescending { it.title.lowercase() }.filter { it.prioritized }
                         }
-
                         else -> todos.sortedByDescending { it.title.lowercase() }
                     }
                 }
 
                 is TodosOrder.Time -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedBy { it.timeStamp }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedBy { it.timeStamp }.filter { it.prioritized }
                         }
 
                         else -> todos.sortedBy { it.timeStamp }
@@ -34,8 +33,8 @@ fun setTodosSortOrder(
 
                 is TodosOrder.Completed -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedBy { it.completed }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedBy { it.completed }.filter { it.prioritized }
                         }
 
                         else -> todos.sortedBy { it.completed }
@@ -48,8 +47,8 @@ fun setTodosSortOrder(
             when (todosListViewModel.uiState.todosOrder) {
                 is TodosOrder.Title -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedBy { it.title.lowercase() }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedBy { it.title.lowercase() }.filter { it.prioritized }
                         }
 
                         else -> todos.sortedBy { it.title.lowercase() }
@@ -58,8 +57,8 @@ fun setTodosSortOrder(
 
                 is TodosOrder.Time -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedByDescending { it.timeStamp }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedByDescending { it.timeStamp }.filter { it.prioritized }
                         }
 
                         else -> todos.sortedByDescending { it.timeStamp }
@@ -68,8 +67,8 @@ fun setTodosSortOrder(
 
                 is TodosOrder.Completed -> {
                     when {
-                        todosListViewModel.uiState.todosOrder.showAchieved -> {
-                            todos.sortedByDescending { it.completed }.filter { it.archived }
+                        todosListViewModel.uiState.todosOrder.showPrioritized -> {
+                            todos.sortedByDescending { it.completed }.filter { it.prioritized }
                         }
 
                         else -> todos.sortedByDescending { it.completed }

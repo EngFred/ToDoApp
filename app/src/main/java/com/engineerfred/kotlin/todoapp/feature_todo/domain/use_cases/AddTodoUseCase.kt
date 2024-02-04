@@ -7,5 +7,5 @@ import javax.inject.Inject
 class AddTodoUseCase @Inject constructor(
     private val tasksRepository: TasksRepository
 ) {
-    fun invoke( todoEntity: TodoEntity) = tasksRepository.addTodo(todoEntity)
+    operator fun invoke( todoEntity: TodoEntity) = tasksRepository.addTodo(todoEntity)
 }

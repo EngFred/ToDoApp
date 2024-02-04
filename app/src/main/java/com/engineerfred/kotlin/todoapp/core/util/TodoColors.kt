@@ -13,7 +13,7 @@ data class TodoColors(
 
 @Composable
 fun getTodoColors(todo: Todo) : TodoColors {
-    return if ( todo.archived ) {
+    return if ( todo.prioritized ) {
         TodoColors(
             backgroundColor = Color(0xFF006E1C).copy(alpha = .6f),
             textColor = Color(0xFFFFFFFF),

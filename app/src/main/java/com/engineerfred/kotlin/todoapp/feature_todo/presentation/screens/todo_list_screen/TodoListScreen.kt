@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Divider
@@ -18,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -34,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,10 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.engineerfred.kotlin.todoapp.R
+import com.engineerfred.kotlin.todoapp.core.util.Constants.EMPTY_SERVER_RESPONSE_EXCEPTION
+import com.engineerfred.kotlin.todoapp.core.util.Constants.NO_INTERNET_EXCEPTION
 import com.engineerfred.kotlin.todoapp.core.util.Resource
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.components.DrawerHeader
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.components.MenuDrawerContent
-import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.components.TodosList
+import com.engineerfred.kotlin.todoapp.feature_todo.presentation.screens.todo_list_screen.components.TasksList
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosListEvents
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosListViewModel
 import kotlinx.coroutines.launch
@@ -56,11 +61,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun TodosListScreen(
     onCreateTask: () -> Unit,
-    onUpdateTask: ( todoId:Long ) -> Unit
+    onUpdateTask: ( todoId:Long ) -> Unit,
+    onSearchClicked: () -> Unit
 ) {
 
     val todosListViewModel = hiltViewModel<TodosListViewModel>()
-    val context = LocalContext.current
 
     val bgColor =  if ( todosListViewModel.uiState.isLightTheme )  {
         Color(0xFF0061A4)
@@ -90,7 +95,6 @@ fun TodosListScreen(
                         modifier = Modifier.fillMaxSize(),
                         alignment = Alignment.TopStart
                     )
-                    //CircularProgressIndicator( modifier = Modifier.size(28.dp) )
                     Text(
                         text = "Loading...",
                         Modifier
@@ -202,7 +206,7 @@ fun TodosListScreen(
                                 },
                                 actions = {
                                     IconButton(onClick = {
-                                        //todo("Search a task")
+                                        onSearchClicked.invoke()
                                     }) {
                                         Icon(
                                             painter = painterResource(id = R.drawable.baseline_search_24),
@@ -216,12 +220,6 @@ fun TodosListScreen(
                     ) {
 
                         Box(modifier = Modifier.fillMaxSize()) {
-//                            AnimatedVisibility( visible = isUpdating ) {
-//                                LinearProgressIndicator( modifier = Modifier
-//                                    .align(Alignment.TopStart)
-//                                    .fillMaxWidth()
-//                                    .padding(bottom = 10.dp, top = 66.dp) )
-//                            }
                             Image(
                                 painter = screenBackgroundImage,
                                 contentDescription = stringResource(id = R.string.screen_background_image),
@@ -229,14 +227,14 @@ fun TodosListScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 alignment = Alignment.TopStart
                             )
-                            TodosList(
+                            TasksList(
                                 todos = todos,
                                 todosListViewModel = todosListViewModel,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(top = 66.dp),
-                                onAchieved = {
-                                    todosListViewModel.onEvent( TodosListEvents.TodoArchived(it) )
+                                onPrioritize = {
+                                    todosListViewModel.onEvent( TodosListEvents.TodoPrioritized(it) )
                                 }, onCompleted = {
                                     todosListViewModel.onEvent( TodosListEvents.TodoCompletedClicked(it) )
                                 }, onDeleted = {
@@ -259,32 +257,73 @@ fun TodosListScreen(
                         modifier = Modifier.fillMaxSize(),
                         alignment = Alignment.TopStart
                     )
-                    Text(
-                        text = todosState.errorMessage,
-                        Modifier
-                            .padding(20.dp)
-                            .align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth()
-                            .padding(26.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        FloatingActionButton(
-                            onClick = { onCreateTask.invoke() },
-                            shape = CircleShape,
-                            containerColor = MaterialTheme.colorScheme.primary
+                    
+                    if ( todosState.errorMessage == EMPTY_SERVER_RESPONSE_EXCEPTION ) {
+                        Text(
+                            text = todosState.errorMessage,
+                            Modifier
+                                .padding(20.dp)
+                                .align(Alignment.Center)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = Color(0xFF0061A4)
+                        )
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth()
+                                .padding(26.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_add),
-                                contentDescription = stringResource(id = R.string.save_todo_icon),
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                            FloatingActionButton(
+                                onClick = { onCreateTask.invoke() },
+                                shape = CircleShape,
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_add),
+                                    contentDescription = stringResource(id = R.string.save_todo_icon),
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
+                    } else if ( todosState.errorMessage == NO_INTERNET_EXCEPTION ) {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = todosState.errorMessage,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 17.sp ,
+                                color = Color(0xFF0061A4)
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            OutlinedButton(onClick = { todosListViewModel.onEvent( TodosListEvents.RetryClicked ) }) {
+                                Text(text = "Try again")
+                            }
+                        }
+                    } else {
+                        Text(
+                            text = todosState.errorMessage,
+                            Modifier
+                                .padding(20.dp)
+                                .align(Alignment.Center)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp,
+                            color = Color(0xFFBA1A1A)
+                        )
                     }
                 }
             }

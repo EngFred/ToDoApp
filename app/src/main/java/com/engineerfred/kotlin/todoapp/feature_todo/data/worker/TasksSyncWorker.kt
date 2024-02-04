@@ -23,7 +23,7 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 
 @HiltWorker
-class TasksWorker @AssistedInject constructor(
+class TasksSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     @Assisted private val cache: TasksDatabase,
@@ -31,11 +31,11 @@ class TasksWorker @AssistedInject constructor(
 ) : CoroutineWorker ( context, workerParams ) {
 
     companion object {
-        const val TAG = "TasksWorker"
+        const val TAG = "TasksSyncWorker"
     }
 
     override suspend fun doWork(): Result {
-        Log.wtf(TAG, "Worker started!...")
+        Log.wtf(TAG, "TasksSyncWorker started!...")
 
         try {
             setForeground(getForeGroundInfo(applicationContext)) //to show the notification on android 12 and above
@@ -73,7 +73,6 @@ class TasksWorker @AssistedInject constructor(
             }
             Log.wtf(TAG, "EVERYTHING IS DONE!")
             return Result.success()
-
         } catch ( e: Exception ) {
             if ( e is ConnectException || e is UnknownHostException ) {
                 Log.wtf(TAG, "Retrying...")
@@ -113,6 +112,7 @@ private fun createNotification(context: Context): Notification {
         .setSmallIcon(R.drawable.to_do_icon)
         .setContentTitle("TodoApp")
         .setContentText("Syncing tasks...")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setOngoing(true)
         .setAutoCancel(true)
 

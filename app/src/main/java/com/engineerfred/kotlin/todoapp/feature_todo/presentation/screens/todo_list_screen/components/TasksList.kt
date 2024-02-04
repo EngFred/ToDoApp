@@ -12,11 +12,11 @@ import com.engineerfred.kotlin.todoapp.feature_todo.presentation.util.showDelete
 import com.engineerfred.kotlin.todoapp.feature_todo.presentation.view_models.todos_list_view_model.TodosListViewModel
 
 @Composable
-fun TodosList(
+fun TasksList(
     modifier: Modifier = Modifier,
     todos: List<Todo>,
     todosListViewModel: TodosListViewModel,
-    onAchieved: (Todo) -> Unit,
+    onPrioritize: (Todo) -> Unit,
     onCompleted: (Todo) -> Unit,
     onDeleted: (Todo) -> Unit,
     onCardClicked: (todoId: Long) -> Unit,
@@ -47,7 +47,7 @@ fun TodosList(
                          onDeleteClicked = { onDeleted.invoke(todo) }
                      )
                 },
-                onAchieveClicked = { onAchieved.invoke(todo) },
+                onAchieveClicked = { onPrioritize.invoke(todo) },
                 onCardClicked = { onCardClicked.invoke(todo.id) },
                 onCompletedClicked = { onCompleted.invoke(todo) },
                 isDarkTheme = isDarkTheme

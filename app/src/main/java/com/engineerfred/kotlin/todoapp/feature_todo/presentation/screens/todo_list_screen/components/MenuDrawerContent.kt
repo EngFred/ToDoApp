@@ -43,7 +43,7 @@ fun MenuDrawerContent(
             },
             selected = false ,
             onClick = {
-                onOrderChange.invoke( TodosOrder.Title(todosOrder.sortingDirection, todosOrder.showAchieved) )
+                onOrderChange.invoke( TodosOrder.Title(todosOrder.sortingDirection, todosOrder.showPrioritized) )
             }
         )
 
@@ -54,7 +54,7 @@ fun MenuDrawerContent(
             },
             selected = false,
             onClick = {
-                onOrderChange.invoke( TodosOrder.Time(todosOrder.sortingDirection, todosOrder.showAchieved) )
+                onOrderChange.invoke( TodosOrder.Time(todosOrder.sortingDirection, todosOrder.showPrioritized) )
             }
         )
 
@@ -65,7 +65,7 @@ fun MenuDrawerContent(
             },
             selected = false,
             onClick = {
-                onOrderChange.invoke( TodosOrder.Completed(todosOrder.sortingDirection, todosOrder.showAchieved) )
+                onOrderChange.invoke( TodosOrder.Completed(todosOrder.sortingDirection, todosOrder.showPrioritized) )
             }
         )
 
@@ -79,7 +79,7 @@ fun MenuDrawerContent(
             },
             selected = false,
             onClick = {
-                onOrderChange.invoke( todosOrder.update( TodosSortingDirection.AtoZ, todosOrder.showAchieved ) )
+                onOrderChange.invoke( todosOrder.update( TodosSortingDirection.AtoZ, todosOrder.showPrioritized ) )
             }
         )
 
@@ -90,7 +90,7 @@ fun MenuDrawerContent(
             },
             selected = false,
             onClick = {
-                onOrderChange.invoke( todosOrder.update( TodosSortingDirection.ZtoA, todosOrder.showAchieved ) )
+                onOrderChange.invoke( todosOrder.update( TodosSortingDirection.ZtoA, todosOrder.showPrioritized ) )
             }
         )
 
@@ -99,11 +99,11 @@ fun MenuDrawerContent(
 
         NavigationDrawerItem(
             label = {
-                DrawerItemRow(text = "Show Achieved", isChecked = todosOrder.showAchieved )
+                DrawerItemRow(text = "Show Prioritized", isChecked = todosOrder.showPrioritized )
             },
             selected = false,
             onClick = {
-                onOrderChange.invoke( todosOrder.update( todosOrder.sortingDirection, !todosOrder.showAchieved ) )
+                onOrderChange.invoke( todosOrder.update( todosOrder.sortingDirection, !todosOrder.showPrioritized ) )
             }
         )
 

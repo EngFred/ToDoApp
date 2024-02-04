@@ -7,5 +7,5 @@ import javax.inject.Inject
 class UpdateTodoUseCase @Inject constructor(
     private val tasksRepository: TasksRepository
 ) {
-    fun invoke( todo: Todo ) = tasksRepository.updateTodo(todo)
+    suspend operator fun invoke( todo: Todo ) = tasksRepository.updateTodo(todo)
 }

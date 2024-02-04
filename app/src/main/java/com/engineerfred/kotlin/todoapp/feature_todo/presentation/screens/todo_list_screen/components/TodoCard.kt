@@ -14,12 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.Icon
+import com.engineerfred.kotlin.todoapp.R
 import com.engineerfred.kotlin.todoapp.core.presentation.components.AchieveButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.CompleteButton
 import com.engineerfred.kotlin.todoapp.core.presentation.components.DeleteButton
@@ -63,11 +67,23 @@ fun TodoCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CompleteButton(onCompleteClicked = {onCompletedClicked.invoke()}, completed = todo.completed, color = todoColors.completedIconColor)
-                Text(text = todo.title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp, color = todoColors.textColor)
+                Text(
+                    text = todo.title,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 18.sp, color = todoColors.textColor,
+                    modifier = Modifier.weight(1f))
+                Icon(
+                    painter = if ( todo.dueDate == null ) painterResource(id = R.drawable.ic_not_scheduled) else painterResource(id = R.drawable.ic_scheduled),
+                    contentDescription = stringResource(id = R.string.schedule_icon),
+                    tint = if (todo.prioritized) Color(0xFFFFFFFF) else Color(0xFF006E1C)
+                )
             }
             Text(
                 text = todo.description,
-                modifier.fillMaxWidth()
+                modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 15.dp),
                 textAlign = TextAlign.Start,
                 maxLines = 3,
@@ -81,13 +97,15 @@ fun TodoCard(
             ) {
                 Text(
                     text = formatTodoTime(todo.timeStamp),
-                    modifier.weight(1f).padding(start = 19.dp),
+                    modifier
+                        .weight(1f)
+                        .padding(start = 19.dp),
                     fontSize = 12.sp,
                     color = if ( isDarkTheme ) Color.DarkGray else Color(0xFF8B5000)
                 )
                 AchieveButton(
                     onAchieveClicked = { onAchieveClicked.invoke() },
-                    achieved = todo.archived,
+                    achieved = todo.prioritized,
                     color = todoColors.achieveIconColor
                 )
                 DeleteButton( onDeleteClicked = onDeleteClicked )
@@ -108,7 +126,8 @@ fun TodoCardPreview() {
                 description = "bla bla bla blah bla bla bla bla blah bla bla bla bla blah bla bla bla bla blah bla",
                 timeStamp = 0L,
                 completed = false,
-                archived = true
+                prioritized = false,
+                dueDate = null
             ),
             onDeleteClicked = { /*TODO*/ },
             onAchieveClicked = { /*TODO*/ },
